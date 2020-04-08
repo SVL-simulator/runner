@@ -12,6 +12,7 @@ before_script:
 build-image-latest:
     stage: build
     script:
+        - ./ci/update-docker-image-ref.sh ${CI_REGISTRY_IMAGE}:latest
         - docker build -f docker/Dockerfile -t ${CI_REGISTRY_IMAGE}:latest .
     only:
         - master

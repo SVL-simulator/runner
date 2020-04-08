@@ -3,13 +3,15 @@
 set -eu
 # set -x
 
+SCENIC_LGSVL_IMAGE_DEFAULT=auto-gitlab.lgsvl.net:4567/eugene.agafonov/scenicrunner
+
 # Envvar defaults
 SCENARIOS_DIR=${SCENARIOS_DIR:-$(pwd)}
 SIMULATOR_HOST=${SIMULATOR_HOST:-localhost}
 SIMULATOR_PORT=${SIMULATOR_PORT:-8181}
 BRIDGE_HOST=${BRIDGE_HOST:-localhost}
 BRIDGE_PORT=${BRIDGE_PORT:-9090}
-SCENIC_LGSVL_IMAGE=${SCENIC_LGSVL_IMAGE:-auto-gitlab.lgsvl.net:4567/eugene.agafonov/scenicrunner}
+SCENIC_LGSVL_IMAGE=${SCENIC_LGSVL_IMAGE:-${SCENIC_LGSVL_IMAGE_DEFAULT}}
 
 
 function run_scenic_container() {
