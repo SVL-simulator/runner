@@ -1,12 +1,12 @@
 [submodule "externals/Scenic"]
 	path = externals/Scenic
-	url = git@auto-gitlab.lgsvl.net:eugene.agafonov/Scenic.git
+	url = ../Scenic.git
 [submodule "externals/VerifAI"]
 	path = externals/VerifAI
-	url = git@auto-gitlab.lgsvl.net:eugene.agafonov/VerifAI.git
+	url = ../VerifAI.git
 [submodule "externals/PythonApi"]
 	path = externals/PythonApi
-	url = git@auto-gitlab.lgsvl.net:HDRP/PythonApi.git
+	url = ../../HDRP/PythonApi.git
 [submodule "externals/dreamview-cyber"]
 	path = externals/dreamview-cyber
-	url = git@auto-gitlab.lgsvl.net:shalin.mehta/dreamview-cyber.git
+	url = ../../shalin.mehta/dreamview-cyber.git
