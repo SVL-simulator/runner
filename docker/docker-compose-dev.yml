@@ -1,0 +1,11 @@
+version: "3"
+services:
+    devenv:
+        build:
+            context: ..
+            dockerfile: docker/Dockerfile
+        working_dir: /src
+        network_mode: host
+        volumes:
+            - ..:/src:ro
+
