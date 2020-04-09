@@ -6,7 +6,7 @@
 	url = ../VerifAI.git
 [submodule "externals/PythonApi"]
 	path = externals/PythonApi
-	url = ../../HDRP/PythonApi.git
+	url = ../../PythonApi.git
 [submodule "externals/dreamview-cyber"]
 	path = externals/dreamview-cyber
-	url = ../../shalin.mehta/dreamview-cyber.git
+	url = ../../../shalin.mehta/dreamview-cyber.git
