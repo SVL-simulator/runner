@@ -8,6 +8,7 @@ SCENIC_LGSVL_IMAGE=scenic_runner_devenv:latest
 export SCENIC_LGSVL_IMAGE
 
 build:
+	export BUILD_REF=dev-`git describe --always --tag` && \
 	${COMPOSE} build
 
 shell:

@@ -1,9 +1,11 @@
-version: "3"
+version: "3.3"
 services:
     devenv:
         build:
             context: ..
             dockerfile: docker/Dockerfile
+            labels:
+                build_ref: ${BUILD_REF}
         working_dir: /src
         network_mode: host
         volumes:
