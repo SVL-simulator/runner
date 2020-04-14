@@ -25,8 +25,7 @@ function run_scenic_container() {
     MOUNT_SCENARIOS_DIR=
 
     if [ "${SCENARIOS_DIR:-none}" != "none" ]; then
-        # MOUNT_SCENARIOS_DIR="--volume ${SCENARIOS_DIR}:/scenarios -workdir=/scenarios"
-        MOUNT_SCENARIOS_DIR="--volume /:/host --workdir=/host/${SCENARIOS_DIR}"
+        MOUNT_SCENARIOS_DIR="--volume ${SCENARIOS_DIR}:/scenarios --workdir=/scenarios"
     else
         echo "W: SCENARIOS_DIR is not set. scenarios dir is not mounted"
         MOUNT_SCENARIOS_DIR='--workdir=/'
