@@ -8,6 +8,7 @@ Download runner [script](scripts/scenic_lgsvl.sh) by this [link](scripts/scenic_
 Alternatively, you can extract to from docker image:
 
 ```
+mkdir -p ~/.local/bin
 docker run --rm auto-gitlab.lgsvl.net:4567/hdrp/scenarios/runner:latest get_scenic_lgsvl > ~/.local/bin/scenic_lgsvl.sh
 ```
 
