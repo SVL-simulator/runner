@@ -21,6 +21,19 @@ build-image-latest:
     tags:
         - docker
 
+build-image-branch:
+    stage: build
+    script:
+        - ./ci/update-docker-image-ref.sh ${CI_REGISTRY_IMAGE}/${CI_COMMIT_REF_SLUG}:latest
+        - docker build -f docker/Dockerfile -t ${CI_REGISTRY_IMAGE}/${CI_COMMIT_REF_SLUG}:latest --label build_ref=${GIT_PRETTY_REF} .
+    only:
+        - branches
+    except:
+        - master
+    tags:
+        - docker
+
+
 publish-image-latest:
     stage: publish
     script:
@@ -30,3 +43,15 @@ publish-image-latest:
         - ci-master
     tags:
         - docker
+
+publish-image-branch:
+    stage: publish
+    script:
+        - docker push ${CI_REGISTRY_IMAGE}/${CI_COMMIT_REF_SLUG}:latest
+    only:
+        - branches
+    except:
+        - master
+    tags:
+        - docker
+
