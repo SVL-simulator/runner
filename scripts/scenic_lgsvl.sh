@@ -65,13 +65,14 @@ function cmd_help() {
     CMD=$(basename $0)
 
 cat<<EOF
-Usage: ${CMD} help|pull|env|bash|COMMAND [ARGS...]
+Usage: ${CMD} help|pull|env|bash|run_scenario|SHELL_COMMAND [ARGS...]
 
-    help - Show this message
-    pull - pull docker image
-    env  - print usefull environment variables
-    bash - Run container with interactive shell
-    COMMAND - run command inside the container.
+    help          - Show this message
+    pull          - pull docker image
+    env           - print usefull environment variables
+    bash          - Run container with interactive shell
+    run           - Run scenario. This subcommand has own help. See '${CMD} run --help for details'
+    SHELL_COMMAND - run shell command inside the container.
 
 Important note: command is launched in a singleshot container so scenarios shall not save any data outside /scenarios folder
 
@@ -107,6 +108,10 @@ case "${1:-}" in
         ;;
     "help")
         cmd_help
+        ;;
+    "run")
+        shift
+        run_scenic_container run $@
         ;;
     *)
         run_scenic_container $@

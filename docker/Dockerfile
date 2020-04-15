@@ -8,6 +8,9 @@ RUN cd /app/externals/VerifAI && python setup.py install
 RUN cd /app/externals/dreamview-cyber && python setup.py install
 RUN cd /app/externals/PythonApi && python setup.py install
 
+ADD runner /app/runner
+RUN cd /app/runner && python setup.py install
+
 COPY docker/get_scenic_lgsvl /opt/scenic_lgsvl/
 COPY scripts/scenic_lgsvl.sh /opt/scenic_lgsvl/
 
