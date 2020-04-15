@@ -1,13 +1,29 @@
 version: "3.3"
 services:
-    devenv:
+    base:
         build:
             context: ..
             dockerfile: docker/Dockerfile
             labels:
                 build_ref: ${BUILD_REF}
+        image: scenario-runner-base
+
+    devenv:
+        build:
+            context: ..
+            dockerfile: docker/Dockerfile.devenv
+            args:
+                BASE_IMAGE: scenario-runner-base
+
         working_dir: /src
         network_mode: host
         volumes:
             - ..:/src:ro
+        environment:
+            - SIMULATOR_HOST
+            - SIMULATOR_PORT
+            - BRIDGE_HOST
+            - BRIDGE_PORT
+            - PYTHONPATH=/src/runner
+
 
