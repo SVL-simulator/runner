@@ -1,0 +1,22 @@
+[flake8]
+# Ignored
+# E221 multiple spaces before operator
+# E203 whitespace before ':'
+# F401 'package' imported but unused
+# F841 local variable 'varname' is assigned to but never used
+
+# To be fixed
+# E111 indentation is not a multiple of four
+# E251 unexpected spaces around keyword / parameter equals
+# E125 continuation line with same indent as next logical line
+# E226 missing whitespace around arithmetic operator
+# E261 at least two spaces before inline comment
+# E262 inline comment should start with '# '
+# W391 blank line at end of file
+# E302 expected 2 blank lines, found 1
+
+ignore = F841,E221
+
+max-line-length = 130
+exclude = tests/*
+max-complexity = 23
