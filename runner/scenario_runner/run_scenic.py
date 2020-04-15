@@ -56,7 +56,6 @@ def run_scenic(scenario_filename, num_iterations, duration, lgsvl_map, output_fo
         # Update error table
         point = scenic_sampler.pointForScene(space, scene)
         # rho = -1 if simulation.collisionOccurred else 1
-        log.debug("collisionOccurred %s", simulation.collisionOccurred)
         rho = simulation.collisionOccurred
         table.update_error_table(point, rho)
         table.table.to_csv(tempName)
