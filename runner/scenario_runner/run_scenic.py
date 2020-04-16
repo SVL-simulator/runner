@@ -12,13 +12,9 @@ import logging
 log = logging.getLogger(__name__)
 
 
-def run_scenic(scenario_filename, num_iterations, duration, lgsvl_map, output_folder):
-    log.info("Connecting to simulator")
 
+def run_scenic(scenario_filename, num_iterations, duration, lgsvl_map, output_folder, save_sampler_data):
     scenario_basename = os.path.basename(scenario_filename)[:-3]
-
-    # Create the Simulator
-    simulator = LGSVLSimulator(lgsvl_map)
 
     log.info("Loading scenario from  %s", scenario_filename)
     # Load Scenic scenario
@@ -35,6 +31,10 @@ def run_scenic(scenario_filename, num_iterations, duration, lgsvl_map, output_fo
     if output_folder:
         tempName = os.path.join(output_folder, tempName)
         tableName = os.path.join(output_folder, tableName)
+
+    # Create the Simulator
+    log.info("Connecting to simulator")
+    simulator = LGSVLSimulator(lgsvl_map)
 
     log.debug("Run %d scenario iterations, %s seconds per iteration", num_iterations, duration)
 
@@ -53,10 +53,13 @@ def run_scenic(scenario_filename, num_iterations, duration, lgsvl_map, output_fo
         simulation.run(maxSteps)
         log.info('Simulation is done')
 
-        # Update error table
-        point = scenic_sampler.pointForScene(space, scene)
-        # rho = -1 if simulation.collisionOccurred else 1
-        rho = simulation.collisionOccurred
-        table.update_error_table(point, rho)
-        table.table.to_csv(tempName)
-        os.rename(tempName, tableName)    # atomic
+        if save_sampler_data:
+            log.info("Saving sampler data %s", tableName)
+
+            # Update error table
+            point = scenic_sampler.pointForScene(space, scene)
+            # rho = -1 if simulation.collisionOccurred else 1
+            rho = simulation.collisionOccurred
+            table.update_error_table(point, rho)
+            table.table.to_csv(tempName)
+            os.rename(tempName, tableName)    # atomic
