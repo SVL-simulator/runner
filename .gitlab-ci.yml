@@ -1,10 +1,12 @@
 image: docker:git
 stages:
     - build
+    - test
     - publish
 
 variables:
   GIT_SUBMODULE_STRATEGY: normal
+  TESTENV_IMAGE: "${CI_REGISTRY_IMAGE}/testenv:${CI_PIPELINE_ID}"
 
 before_script:
   - which docker && test -n "${CI_BUILD_TOKEN}" && docker login -u ${CI_REGISTRY_USER} -p ${CI_BUILD_TOKEN} ${CI_REGISTRY}
@@ -33,6 +35,22 @@ build-image-branch:
     tags:
         - docker
 
+build-test-image:
+    stage: build
+    script:
+        - docker build -f docker/Dockerfile -t ${CI_REGISTRY_IMAGE}/base .
+        - docker build -f docker/Dockerfile.devenv -t ${TESTENV_IMAGE} --build-arg BASE_IMAGE=${CI_REGISTRY_IMAGE}/base .
+        - docker push ${TESTENV_IMAGE}
+    tags:
+        - docker
+
+pytest:
+    stage: test
+    image: ${TESTENV_IMAGE}
+    script:
+        - pytest -s -v runner/tests
+    tags:
+        - docker
 
 publish-image-latest:
     stage: publish

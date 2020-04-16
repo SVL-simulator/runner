@@ -36,3 +36,6 @@ cleanup:
 
 flake8:
 	${COMPOSE} run --rm devenv flake8 runner
+
+test:
+	${COMPOSE} run --rm devenv pytest -s -v runner/tests
