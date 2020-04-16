@@ -10,11 +10,20 @@ export SCENIC_LGSVL_IMAGE
 BUILD_REF=dev-`git describe --always --tag`
 export BUILD_REF
 
+build-base:
+	docker build -f docker/Dockerfile -t local/scenic_runner_base .
+
+build-devenv: build-base
+	docker build -f docker/Dockerfile.devenv --build-arg BASE_IMAGE=local/scenic_runner_base -t local/scenic_runner_devenv .
+
 build:
 	${COMPOSE} build
 
 shell:
 	./scripts/scenic_lgsvl.sh
+
+env:
+	./scripts/scenic_lgsvl.sh env
 
 run-help:
 	./scripts/scenic_lgsvl.sh run --help
