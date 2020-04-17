@@ -1,30 +1,35 @@
 #!/bin/bash
 
-set -x
-set -e
 set -u
+
+if [ "${#@}" == "0" ]; then
+    echo $(basename $0) DOCKER_TAG [DOCKER_IMAGE_PREFIX]
+    exit 1
+fi
+
+set -e
+set -x
 set -o pipefail
 
 R=$(readlink -f $(dirname $0))
 
-TAG=${1}
-
+DOCKER_TAG=${1}
 DOCKER_IMAGE_PREFIX=${2:-auto-gitlab.lgsvl.net:4567/hdrp/scenarios}
 
 DIST_IMAGES='runner'
-DIST_NAME=lgsvlsimulator-scenarios-$TAG
+DIST_NAME=lgsvlsimulator-scenarios-$DOCKER_TAG
 DIST_PATH=$(pwd)/dist/$DIST_NAME
 
 PUBLIC_IMAGE=lgsvl/simulator-scenarios-runner
 
 function save_docker_images {
     mkdir -p $DIST_PATH/docker
-    ${R}/save_docker_image.sh ${DOCKER_IMAGE_PREFIX}/runner $TAG $PUBLIC_IMAGE $DIST_PATH/docker
+    ${R}/save_docker_image.sh ${DOCKER_IMAGE_PREFIX}/runner $DOCKER_TAG $PUBLIC_IMAGE $DIST_PATH/docker
 }
 
 function export_runner_script {
     cp ./scripts/scenic_lgsvl.sh $DIST_PATH/scenic_lgsvl.sh
-    ${R}/update-docker-image-ref.sh $DIST_PATH/scenic_lgsvl.sh lgsvl/simulator-scenarios-runner:$TAG
+    ${R}/update-docker-image-ref.sh $DIST_PATH/scenic_lgsvl.sh lgsvl/simulator-scenarios-runner:$DOCKER_TAG
 }
 
 function copy_scenarios {
