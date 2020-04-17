@@ -39,3 +39,10 @@ flake8:
 
 test:
 	${COMPOSE} run --rm devenv pytest -s -v runner/tests
+
+submodules-pull-master:
+	git submodule init
+	git submodule update
+	git submodule foreach git checkout master
+	git submodule foreach git pull
+	git status
