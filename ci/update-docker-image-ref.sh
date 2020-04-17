@@ -4,6 +4,9 @@ set -x
 set -e
 set -u
 
-DOCKER_IMAGE=$1
+SCRIPT=$1
+DOCKER_IMAGE=$2
 
-sed "s|^\(SCENIC_LGSVL_IMAGE_DEFAULT\)=.*|\1=${DOCKER_IMAGE} \# Updated by CI|" -i ./scripts/scenic_lgsvl.sh
+test -f "${SCRIPT}"
+
+sed "s|^\(SCENIC_LGSVL_IMAGE_DEFAULT\)=.*|\1=${DOCKER_IMAGE} \# Updated by CI|" -i "${SCRIPT}"

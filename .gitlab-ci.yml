@@ -15,7 +15,7 @@ before_script:
 build-image-latest:
     stage: build
     script:
-        - ./ci/update-docker-image-ref.sh ${CI_REGISTRY_IMAGE}:latest
+        - ./ci/update-docker-image-ref.sh scripts/scenic_lgsvl.sh ${CI_REGISTRY_IMAGE}:latest
         - docker build -f docker/Dockerfile -t ${CI_REGISTRY_IMAGE}:latest --label build_ref=${GIT_PRETTY_REF} .
     only:
         - master
@@ -26,7 +26,7 @@ build-image-latest:
 build-image-branch:
     stage: build
     script:
-        - ./ci/update-docker-image-ref.sh ${CI_REGISTRY_IMAGE}/${CI_COMMIT_REF_SLUG}:latest
+        - ./ci/update-docker-image-ref.sh scripts/scenic_lgsvl.sh ${CI_REGISTRY_IMAGE}/${CI_COMMIT_REF_SLUG}:latest
         - docker build -f docker/Dockerfile -t ${CI_REGISTRY_IMAGE}/${CI_COMMIT_REF_SLUG}:latest --label build_ref=${GIT_PRETTY_REF} .
     only:
         - branches
