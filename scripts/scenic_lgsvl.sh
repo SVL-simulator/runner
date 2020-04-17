@@ -3,7 +3,7 @@
 set -eu
 # set -x
 
-SCENIC_LGSVL_IMAGE_DEFAULT=auto-gitlab.lgsvl.net:4567/eugene.agafonov/scenicrunner
+SCENIC_LGSVL_IMAGE_DEFAULT=auto-gitlab.lgsvl.net:4567/hdrp/scenarios/runner:latest
 
 # Envvar defaults
 SCENARIOS_DIR=${SCENARIOS_DIR:-$(pwd)}
@@ -13,6 +13,22 @@ BRIDGE_HOST=${BRIDGE_HOST:-localhost}
 BRIDGE_PORT=${BRIDGE_PORT:-9090}
 SCENIC_LGSVL_IMAGE=${SCENIC_LGSVL_IMAGE:-${SCENIC_LGSVL_IMAGE_DEFAULT}}
 
+function load_docker_image {
+    IMAGE_NAME=${1}
+    TARBALL_DIR=${2}
+
+    TARBALL_NAME=$(echo ${IMAGE_NAME} | tr '/-' '__' | tr ':' '-')
+
+    TARBALL_PATH="${TARBALL_DIR}/${TARBALL_NAME}.tar"
+
+    if ! docker history ${IMAGE_NAME} 2>&1 > /dev/null; then
+        docker load -i ${TARBALL_PATH}
+    fi
+}
+
+R=$(readlink -f "$(dirname $0)")
+
+load_docker_image $SCENIC_LGSVL_IMAGE ${R}/docker
 
 function run_scenic_container() {
     if [ ${#@} == 0 ]; then
