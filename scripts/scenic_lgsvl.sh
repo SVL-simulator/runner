@@ -17,7 +17,7 @@ function load_docker_image {
     IMAGE_NAME=${1}
     TARBALL_DIR=${2}
 
-    TARBALL_NAME=$(echo ${IMAGE_NAME} | tr '/-' '__' | tr ':' '-')
+    TARBALL_NAME=$(echo ${IMAGE_NAME} | tr ':/' '-')
 
     TARBALL_PATH="${TARBALL_DIR}/${TARBALL_NAME}.tar"
 

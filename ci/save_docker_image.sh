@@ -11,9 +11,9 @@ OUTPUT_FOLDER=${4:-$(pwd)/dist}
 
 SOURCE_IMAGE=${SRC_IMAGE}:${TAG}
 
-TARBALL_BASE_NAME=$(echo ${DST_IMAGE} | tr '/-' '__')
+TARBALL_NAME=$(echo "${DST_IMAGE}:${TAG}" | tr ':/' '-')
 
-TARBALL_PATH="${OUTPUT_FOLDER}/${TARBALL_BASE_NAME}-${TAG}.tar"
+TARBALL_PATH="${OUTPUT_FOLDER}/${TARBALL_NAME}.tar"
 
 docker history ${SOURCE_IMAGE} > /dev/null 2>&1  || \
 (
