@@ -3,6 +3,7 @@ stages:
     - build
     - test
     - publish
+    - release_bundle
 
 variables:
   GIT_SUBMODULE_STRATEGY: normal
@@ -73,3 +74,21 @@ publish-image-branch:
     tags:
         - docker
 
+release_bundle_latest:
+    stage: release_bundle
+    script:
+        - ./ci/make_release_bundle.sh latest
+    only:
+        - master
+        - ci-master
+    tags:
+        - docker
+
+release_bundle_tag:
+    stage: release_bundle
+    script:
+        - ./ci/make_release_bundle.sh ${CI_COMMIT_TAG}
+    only:
+        - tags
+    tags:
+        - docker
