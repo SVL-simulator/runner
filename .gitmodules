@@ -10,3 +10,6 @@
 [submodule "externals/dreamview-cyber"]
 	path = externals/dreamview-cyber
 	url = ../../../shalin.mehta/dreamview-cyber.git
+[submodule "scenarios"]
+	path = scenarios
+	url = ../scenarios.git

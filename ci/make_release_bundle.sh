@@ -35,11 +35,6 @@ function export_runner_script {
 function copy_scenarios {
     test -d scenarios || (echo "E: Can't find scenarios"; exit 1)
     cp -r scenarios $DIST_PATH
-
-    pushd $DIST_PATH/scenarios
-    git clean -xdf
-    git reset --hard HEAD
-    popd
 }
 
 function show_tree() {
@@ -66,7 +61,7 @@ export_runner_script
 copy_scenarios
 
 # Some housekeeping
-find $DIST_PATH -type d -name '.git*' | xargs rm -rf
+find $DIST_PATH -name '.git*' | xargs rm -rf
 
 pushd $DIST_PATH/..
 
