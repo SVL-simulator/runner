@@ -33,6 +33,7 @@ build-image-branch:
         - branches
     except:
         - master
+        - ci-master
     tags:
         - docker
 
@@ -71,6 +72,7 @@ publish-image-branch:
         - branches
     except:
         - master
+        - ci-master
     tags:
         - docker
 
