@@ -3,7 +3,7 @@ stages:
     - build
     - test
     - publish
-    - release_bundle
+    - make_bundle
 
 variables:
   GIT_SUBMODULE_STRATEGY: normal
@@ -76,20 +76,37 @@ publish-image-branch:
     tags:
         - docker
 
-release_bundle_latest:
-    stage: release_bundle
+make_bundle_latest:
+    image: docker:git
+    stage: make_bundle
     script:
+        - apk --no-cach add bash zip tree
         - ./ci/make_release_bundle.sh latest
+        - mv dist/*.zip .
+    artifacts:
+        name: "$CI_COMMIT_REF_SLUG-$CI_PIPELINE_ID"
+        paths:
+            - "*.zip"
+        expire_in: 1 week
     only:
         - master
         - ci-master
+        - /.*-trybuild/
     tags:
         - docker
 
-release_bundle_tag:
-    stage: release_bundle
+make_bundle_tag:
+    image: docker:git
+    stage: make_bundle
     script:
+        - apk --no-cach add bash zip tree
         - ./ci/make_release_bundle.sh ${CI_COMMIT_TAG}
+        - mv dist/*.zip .
+    artifacts:
+        name: "$CI_COMMIT_REF_SLUG-$CI_PIPELINE_ID"
+        paths:
+            - "*.zip"
+        expire_in: 1 week
     only:
         - tags
     tags:
