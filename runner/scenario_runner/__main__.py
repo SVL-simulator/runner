@@ -5,7 +5,7 @@ import argparse
 import os
 import sys
 
-from .run_scenic import run_scenic
+from .run_scenic import run_scenic, check_scenic
 from .run_python import run_python
 
 import logging
@@ -55,6 +55,10 @@ def parse_args():
                         default=False,
                         help="Save sampler data after simulation is finished.")
 
+    parser.add_argument("--check", '-t', action='store_true',
+                        default=False,
+                        help="Parse scenic files and exits")
+
     return parser.parse_args()
 
 
@@ -64,8 +68,16 @@ def main():
     setup_log_levels()
 
     if args.scenario_file[-3:] == ".sc":
-        log.info("Run Scenic scenario from %s", args.scenario_file)
-        run_scenic(args.scenario_file, args.num_iterations, args.duration, args.lgsvl_map, args.output_dir, args.sampler)
+        if args.check:
+            try:
+                check_scenic(args.scenario_file)
+                log.info(" Scenic script %s OK ", args.scenario_file)
+            except Exception as e:
+                log.error("Error in scenic script %s: %s", args.scenario_file, e)
+                raise
+        else:
+            log.info("Run Scenic scenario from %s", args.scenario_file)
+            run_scenic(args.scenario_file, args.num_iterations, args.duration, args.lgsvl_map, args.output_dir, args.sampler)
     elif args.scenario_file[-3:] == ".py":
         log.info("Run python script %s", args.scenario_file)
         run_python(args.scenario_file, args.extra_args)

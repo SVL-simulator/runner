@@ -12,7 +12,6 @@ import logging
 log = logging.getLogger(__name__)
 
 
-
 def run_scenic(scenario_filename, num_iterations, duration, lgsvl_map, output_folder, save_sampler_data):
     scenario_basename = os.path.basename(scenario_filename)[:-3]
 
@@ -63,3 +62,7 @@ def run_scenic(scenario_filename, num_iterations, duration, lgsvl_map, output_fo
             table.update_error_table(point, rho)
             table.table.to_csv(tempName)
             os.rename(tempName, tableName)    # atomic
+
+
+def check_scenic(filename):
+    scenic.scenarioFromFile(filename)
