@@ -21,7 +21,7 @@ function load_docker_image {
 
     TARBALL_PATH="${TARBALL_DIR}/${TARBALL_NAME}.tar"
 
-    if ! docker history ${IMAGE_NAME} 2>&1 > /dev/null; then
+    if ! docker history ${IMAGE_NAME} > /dev/null 2>&1; then
         docker load -i ${TARBALL_PATH}
     fi
 }
