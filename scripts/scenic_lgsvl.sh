@@ -81,10 +81,9 @@ function cmd_help() {
     CMD=$(basename $0)
 
 cat<<EOF
-Usage: ${CMD} help|pull|env|bash|run_scenario|SHELL_COMMAND [ARGS...]
+Usage: ${CMD} help|env|bash|run_scenario|SHELL_COMMAND [ARGS...]
 
     help          - Show this message
-    pull          - pull docker image
     env           - print usefull environment variables
     bash          - Run container with interactive shell
     run           - Run scenario. This subcommand has own help. See '${CMD} run --help for details'
@@ -99,19 +98,8 @@ ENVIRONMENT VARIABLES:
     * BRIDGE_HOST - ROS/Apollo bridge hostname (default:localhost)
     * BRIDGE_PORT - ROS/Apollo bridge port (default:9090)
     * SCENARIOS_DIR - host folder to be mounted as /scenarios inside the container
-    * SCENIC_LGSVL_IMAGE - docker image to run
 
     '${CMD} env' to list current values
-
-
-HOW TO GET THIS FILE
-
-    1. Get it form the image:
-
-        $> scenic_lgsvl.sh pull
-        $> docker run --rm ${SCENIC_LGSVL_IMAGE} get_scenic_lgsvl > ~/.local/bin/scenic_lgsvl.sh
-        $> chmod +x ~/.local/bin/scenic_lgsvl.sh
-
 EOF
 }
 
