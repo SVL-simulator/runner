@@ -5,7 +5,7 @@ services:
             context: ..
             dockerfile: docker/Dockerfile
             labels:
-                build_ref: ${BUILD_REF}
+                com.lgsvlsimulator.scenarios_runner.build_ref: ${BUILD_REF}
         image: scenario-runner-base
 
     devenv:

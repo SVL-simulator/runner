@@ -1,13 +1,13 @@
 COMPOSE_PROJECT_NAME=scenic_runner
 export COMPOSE_PROJECT_NAME
 
-COMPOSE=docker-compose -f docker/docker-compose-dev.yml
+COMPOSE:=docker-compose -f docker/docker-compose-dev.yml
 
 
-SCENIC_LGSVL_IMAGE=scenic_runner_devenv:latest
+SCENIC_LGSVL_IMAGE:=scenic_runner_devenv:latest
 export SCENIC_LGSVL_IMAGE
 
-BUILD_REF=dev-`git describe --always --tag`
+BUILD_REF:="devenv-$(shell git describe --always --tag)"
 export BUILD_REF
 
 build-base:
@@ -46,3 +46,10 @@ submodules-pull-master:
 	git submodule foreach git checkout master
 	git submodule foreach git pull
 	git status
+
+inspect-labels:
+	docker inspect --format {{.Config.Labels}} ${SCENIC_LGSVL_IMAGE}
+
+
+version:
+	./scripts/scenic_lgsvl.sh version

@@ -81,9 +81,10 @@ function cmd_help() {
     CMD=$(basename $0)
 
 cat<<EOF
-Usage: ${CMD} help|env|bash|run_scenario|SHELL_COMMAND [ARGS...]
+Usage: ${CMD} help|version|env|bash|run_scenario|SHELL_COMMAND [ARGS...]
 
     help          - Show this message
+    version       - Version info
     env           - print usefull environment variables
     bash          - Run container with interactive shell
     run           - Run scenario. This subcommand has own help. See '${CMD} run --help for details'
@@ -103,6 +104,16 @@ ENVIRONMENT VARIABLES:
 EOF
 }
 
+function cmd_version {
+    function get_image_label {
+        LABEL=$1
+        docker inspect --format "{{index .Config.Labels \"com.lgsvlsimulator.scenarios_runner.${LABEL}\"}}" ${SCENIC_LGSVL_IMAGE}
+    }
+
+    echo "Docker image: ${SCENIC_LGSVL_IMAGE}"
+    echo "Build ID:     $(get_image_label 'build_ref')"
+}
+
 case "${1:-}" in
     "pull")
         cmd_pull_image
@@ -112,6 +123,9 @@ case "${1:-}" in
         ;;
     "help")
         cmd_help
+        ;;
+    "version")
+        cmd_version
         ;;
     "run")
         shift
