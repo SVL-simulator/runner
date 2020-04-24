@@ -37,6 +37,10 @@ function copy_scenarios {
     cp -r scenarios $DIST_PATH
 }
 
+function copy_docs {
+    cp -r docs $DIST_PATH
+}
+
 function show_tree() {
     TREE=$(which tree || true)
 
@@ -59,6 +63,7 @@ mkdir -p $DIST_PATH
 save_docker_images
 export_runner_script
 copy_scenarios
+copy_docs
 
 # Some housekeeping
 find $DIST_PATH -name '.git*' | xargs rm -rf
