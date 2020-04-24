@@ -82,7 +82,6 @@ make_bundle_latest:
     only:
         - master
         - ci-master
-        - /.*-trybuild/
     tags:
         - docker
 
