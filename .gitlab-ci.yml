@@ -73,11 +73,11 @@ make_bundle_latest:
     script:
         - apk --no-cach add bash zip tree
         - ./ci/make_release_bundle.sh latest
-        - mv dist/*.zip .
+        - mv dist/lgsvlsimulator-scenarios-latest .
     artifacts:
-        name: "$CI_COMMIT_REF_SLUG-$CI_PIPELINE_ID"
+        name: "lgsvlsimulator-scenarios-latest-$CI_COMMIT_REF_SLUG-$CI_PIPELINE_ID"
         paths:
-            - "*.zip"
+            - "lgsvlsimulator-scenarios-latest"
         expire_in: 1 week
     only:
         - master
@@ -91,11 +91,11 @@ make_bundle_tag:
     script:
         - apk --no-cach add bash zip tree
         - ./ci/make_release_bundle.sh ${CI_COMMIT_TAG}
-        - mv dist/*.zip .
+        - mv dist/lgsvlsimulator-scenarios-${CI_COMMIT_TAG} .
     artifacts:
-        name: "$CI_COMMIT_REF_SLUG-$CI_PIPELINE_ID"
+        name: "lgsvlsimulator-scenarios-${CI_COMMIT_TAG}"
         paths:
-            - "*.zip"
+            - "lgsvlsimulator-scenarios-${CI_COMMIT_TAG}"
         expire_in: 1 week
     only:
         - tags
