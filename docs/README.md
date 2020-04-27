@@ -13,7 +13,7 @@ Among the use-cases of Scenario Runner are:
 - Performing automated (e.g. acceptance) tests based on a set of repeatable scenarios
 - Performing automated regressions tests
 
-This preview release provides the ability to perform several example scenarios in the LGSVL Simulator using Apollo for Autonomous Driving. This document describes how to run these scenarios.
+This first preview release of the Scenario Runner provides the ability to perform several example scenarios in the LGSVL Simulator using Apollo for Autonomous Driving. This document describes how to run these scenarios.
 
 For example, one provided example is an abstract "cut-in" scenario which can be performed on a test map (shown in the first two images below) or on other maps such as San Francisco (also shown in the image below).
 
@@ -197,13 +197,16 @@ Example Scenarios
 
 There are several example scenarios provided with the Scenario Runner in this preview release.
 
+As noted above, the Scenario Runner script can be copied to the `~/local/bin/` directory if that directory is in the $PATH, or it can simply be referenced from the scenarios directory as `../scenic_lgsvl.sh`
+
 
 ### Random Placement Scenario
 
 The Random Placement scenario will randomly place the ego vehicle on the map and then drive to a random destination.
 
 To run the Random Placement scenario three times on the Shalun map, navigate to the scenarios directory and type:
-`scenic_lgsvl.sh run -i 3 -m Shalun random-placement/scenic-example.sc`
+
+$ `../scenic_lgsvl.sh run -i 3 -m Shalun random-placement/scenic-example.sc`
 
 
 ### Cut-in Scenario
@@ -211,10 +214,12 @@ To run the Random Placement scenario three times on the Shalun map, navigate to 
 The cut-in scenario is a vehicle cut-in scenario for a two-lane road. This is an abstract scenario that can be run on a test map. The NPC vehicle will start out next to the ego vehicle, start driving and then cut in front of the ego vehicle and come to a stop. There is a similar scenario that can be run on the San Francisco map.
 
 To run the Cut-in scenario twice on a test map, navigate to the scenarios directory and type:
-`scenic_lgsvl.sh run -i 2 -m Straight2LaneSame cut-in/scenic-cut-in.sc`
+
+$`../scenic_lgsvl.sh run -i 2 -m Straight2LaneSame cut-in/scenic-cut-in.sc`
 
 To run the Cut-in scenario three times on the San Francisco map, navigate to the scenarios directory and type:
-`scenic_lgsvl.sh run -i 3 -m SanFrancisco cut-in/scenic-cut-in-sf.sc`
+
+$`../scenic_lgsvl.sh run -i 3 -m SanFrancisco cut-in/scenic-cut-in-sf.sc`
 
 Note: The `scenic-cut-in-sf.sc` script is based on the `scenic-cut-in.sc` script but was modified to load the "SanFrancisco" OpenDRIVE HD map instead of "Straight2LaneSame", and the `apolloHDMap` param was changed to select the correct map from Apollo's Dreamview. The San Francisco HD map is very large and takes a while to parse before the first iteration can begin.
 
@@ -224,11 +229,15 @@ Note: The `scenic-cut-in-sf.sc` script is based on the `scenic-cut-in.sc` script
 The Pedestrian Crossing scenario demonstrates a vehicle approaching a crosswalk or turning at an intersection with a crosswalk. A pedestrian will enter the crosswalk forcing the ego vehicle to stop and wait for the pedestrian. There is a scenario that can be run on the GoMentum map and a similar scenario for the Borregas map.
 
 To run the Pedestrian Crossing scenario three times on the GoMentum map, navigate to the scenarios directory and type:
-`scenic_lgsvl.sh run -i 3 -m GoMentum gomentum-pedestrian-yield/gomentum-pedestrian-yield.sc`
+
+$`../scenic_lgsvl.sh run -i 3 -m GoMentum gomentum-pedestrian-yield/gomentum-pedestrian-yield.sc`
 
 To run the Pedestrian Crossing scenario ten times on the Borregas map, navigate to the scenarios directory and type:
-`scenic_lgsvl.sh run -i 10 -m BorregasAve borregas-intersection/scenic-borregas.py`
+
+$`../scenic_lgsvl.sh run -i 10 -m BorregasAve borregas-intersection/scenic-borregas.py`
 
 ### Known issues
 
 - If the ego vehicle is not placed properly within a driveable lane, Apollo may not correctly drive the vehicle to the requested destination. This is a known issue and will be addressed in a future version of the Scenario Runner.
+- After `Initializing Apollo...` appears in the console, there may be one or more `Module <name> is not ready...` messages followed by a `waiting to stabilize` message and a small delay, followed by `Initialized Apollo.` If `waiting to stabilize` does not appear, then the scenario runner script should be restarted; if it happens again then Apollo may need to be restarted.
+- The SanFrancisco HD map is very large and takes a while to parse before the first iteration can begin. 
