@@ -55,7 +55,7 @@ scenic-lgsvl-2020.04-rc1
 
 - The `docker` directory contains a docker image saved as a tarball.
   - `scenic_runner-<release-tag>.tar` contains the scenic runner tool.
-- The `scenarios` directory contains three sample scenarios:
+- The `scenarios` directory contains four sample scenarios:
   - `borregas-intersection` is a pedestrian-crossing scenario on the Borregas map
   - `cut-in` is a vehicle cut-in scenario on a two lane road test map
   - `gomentum-pedestrian-yield` is a pedestrian-crossing scenario on the GoMentum map
@@ -104,7 +104,7 @@ You will need to create an account to login to the Web UI. Once logged in you wi
 
 #### Launching the API-only simulation
 1. In the `Simulations` tab in the Web UI click on the `API Only` simulation.
-2. At the bottom of the Web UI, click on the read "Run" (triangle/play) button to start the API-only simulation.
+2. At the bottom of the Web UI, click on the red "Run" (triangle/play) button to start the API-only simulation.
 
 See simulator documentation on the [Web UI Simulations tab](https://www.lgsvlsimulator.com/docs/simulations-tab/) for more information on setting up simulations.
 
@@ -152,21 +152,38 @@ The Scenario Runner supports the following commands:
 
 The Scenario Runner supports the following command line parameters when running a scenario:
 
-  `--num-iterations NUM_ITERATIONS, -i NUM_ITERATIONS`                        Number of scenario iterations. (default: 42)
+  `-i, --num-iterations NUM_ITERATIONS`
+                        Number of scenario iterations. (default: 42)
 
-  `--duration DURATION, -d DURATION`                        Maximum scenario duration in seconds. (default: 20.0)
+  `-d, --duration DURATION`
+                        Maximum scenario duration in seconds. (default: 20.0)
 
-  `--lgsvl-map MAP_NAME, -m MAP_NAME`                        Map (default: GoMentum)  `--output-dir OUTPUT_DIR, -O OUTPUT_DIR`                        Default results output folder  `--sampler, -s`       Save sampler data after simulation is finished.  `--check, -t`         Parse scenic file and exit  
+  `-m, --lgsvl-map MAP_NAME`
+                        Map (default: GoMentum)
+
+  `-O, --output-dir OUTPUT_DIR`
+                        Default results output folder
+
+  `-s, --sampler`       Save sampler data after simulation is finished.
+
+  `-t, --check`         Parse scenic file and exit
+
+  
 #### Scenario Runner Environment Variables
 
 The Scenario Runner supports the following environment variables (and default values) when running a scenario:
 
-`SIMULATOR_HOST=localhost`
-`SIMULATOR_PORT=8181``BRIDGE_HOST=localhost``BRIDGE_PORT=9090`
+  `SIMULATOR_HOST=localhost`
 
-If simulator is being run on a separate machine make sure to set the `SIMULATOR_HOST` environment variable with the IP address of the machine running the simulator; for example `export SIMULATOR_HOST=192.168.0.2`. 
+  `SIMULATOR_PORT=8181`
 
-The `BRIDGE_HOST` machine is the machine which is running Apollo (and the CyberRT bridge) and is most likely also the same machine running Scenario Runner, so it should be fine with the default value of `localhost`.
+  `BRIDGE_HOST=localhost`
+
+  `BRIDGE_PORT=9090`
+
+If simulator is being run on a separate machine than the Scenario Runner make sure to set the `SIMULATOR_HOST` environment variable with the IP address of the machine running the simulator; for example `export SIMULATOR_HOST=192.168.0.2`. 
+
+The `BRIDGE_HOST` machine is the machine which is running Apollo (and the CyberRT bridge) and is most likely also the same machine running Scenario Runner. If simulator and Apollo are running on the same machine, use the default value of `localhost`. Otherwise, set `BRIDGE_HOST` to the IP address of the machine running Apollo; for example `export BRIDGE_HOST=192.168.0.1`.
 
 
 Example Scenarios
@@ -185,18 +202,20 @@ To run the Random Placement scenario three times on the Shalun map, navigate to 
 
 ### Cut-in Scenario
 
-The cut-in scenario is a vehicle cut-in scenario for a two lane road. This is an abstract scenario that can be run on a test map or randomly on the San Francisco map. The NPC vehicle will start out next to the ego vehicle, start driving and then cut in front of the ego vehicle and come to a stop.
+The cut-in scenario is a vehicle cut-in scenario for a two-lane road. This is an abstract scenario that can be run on a test map. The NPC vehicle will start out next to the ego vehicle, start driving and then cut in front of the ego vehicle and come to a stop. There is a similar scenario that can be run on the San Francisco map.
 
 To run the Cut-in scenario twice on a test map, navigate to the scenarios directory and type:
 `scenic_lgsvl.sh run -i 2 -m Straight2LaneSame cut-in/scenic-cut-in.sc`
 
 To run the Cut-in scenario twice on the San Francisco map, navigate to the scenarios directory and type:
-`scenic_lgsvl.sh run -i 2 -m SanFrancisco cut-in/scenic-cut-in.sc`
+`scenic_lgsvl.sh run -i 2 -m Straight2LaneSame cut-in/scenic-cut-in-sf.sc`
+
+The `scenic-cut-in-sf.sc` script was modified to load the SanFrancisco OpenDRIVE HD map instead of Straight2LaneSame, and the `apolloHDMap` param was changed to use the correct map from Apollo's Dreamview.
 
 
 ### Pedestrian Crossing Scenarios
 
-The Pedestrian Crossing scenario demonstrates a vehicle approaching a crosswalk or turning at an intersection with a crosswalk. A pedestrian will enter the crosswalk forcing the ego vehicle to stop and wait for the pedestrian. This is a scenario that can be run on the GoMentum map or on the Borregas map.
+The Pedestrian Crossing scenario demonstrates a vehicle approaching a crosswalk or turning at an intersection with a crosswalk. A pedestrian will enter the crosswalk forcing the ego vehicle to stop and wait for the pedestrian. There is a scenario that can be run on the GoMentum map and a similar scenario for the Borregas map.
 
 To run the Pedestrian Crossing scenario three times on the GoMentum map, navigate to the scenarios directory and type:
 `scenic_lgsvl.sh run -i 3 -m GoMentum gomentum-pedestrian-yield/gomentum-pedestrian-yield.sc`
