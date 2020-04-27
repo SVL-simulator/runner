@@ -24,6 +24,6 @@ services:
             - SIMULATOR_PORT
             - BRIDGE_HOST
             - BRIDGE_PORT
-            - PYTHONPATH=/src/runner
+            - "PYTHONPATH=/src/runner:/src/externals/Scenic/src:/src/externals/PythonApi:/src/externals/VerifAI:/src/externals/dreamview-cyber"
 
 
