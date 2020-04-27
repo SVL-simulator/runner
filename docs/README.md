@@ -52,7 +52,7 @@ scenic-lgsvl-2020.04-rc1
 │   │   ├── Shalun
 │   │   │   └── shalun.xodr
 │   │   └── Straight2LaneSame
-│   │       └── shalun.xodr
+│   │       └── Straight2LaneSame.xodr
 │   └── random-placement
 │       └── scenic-example.sc
 └── scenic_lgsvl.sh
@@ -152,6 +152,7 @@ The Scenario Runner supports the following commands:
 - `scenic_lgsvl.sh env` to print useful environment variables
 - `scenic_lgsvl.sh run` to run a Scenario with optional parameters
 - `scenic_lgsvl.sh run --help` for help running a Scenario
+- `scenic_lgsvl.sh version` to print version information
 
 #### Scenario Runner Parameters
 
@@ -212,10 +213,10 @@ The cut-in scenario is a vehicle cut-in scenario for a two-lane road. This is an
 To run the Cut-in scenario twice on a test map, navigate to the scenarios directory and type:
 `scenic_lgsvl.sh run -i 2 -m Straight2LaneSame cut-in/scenic-cut-in.sc`
 
-To run the Cut-in scenario twice on the San Francisco map, navigate to the scenarios directory and type:
-`scenic_lgsvl.sh run -i 2 -m Straight2LaneSame cut-in/scenic-cut-in-sf.sc`
+To run the Cut-in scenario three times on the San Francisco map, navigate to the scenarios directory and type:
+`scenic_lgsvl.sh run -i 3 -m SanFrancisco cut-in/scenic-cut-in-sf.sc`
 
-The `scenic-cut-in-sf.sc` script was modified to load the SanFrancisco OpenDRIVE HD map instead of Straight2LaneSame, and the `apolloHDMap` param was changed to use the correct map from Apollo's Dreamview.
+Note: The `scenic-cut-in-sf.sc` script is based on the `scenic-cut-in.sc` script but was modified to load the "SanFrancisco" OpenDRIVE HD map instead of "Straight2LaneSame", and the `apolloHDMap` param was changed to select the correct map from Apollo's Dreamview. The San Francisco HD map is very large and takes a while to parse before the first iteration can begin.
 
 
 ### Pedestrian Crossing Scenarios
@@ -230,4 +231,4 @@ To run the Pedestrian Crossing scenario ten times on the Borregas map, navigate 
 
 ### Known issues
 
-- If the ego vehicle is not placed properly in a driveable lane, Apollo may not correctly drive the vehicle to the requested destination. This is a known issue and will be addressed in a future version of the Scenario Runner.
+- If the ego vehicle is not placed properly within a driveable lane, Apollo may not correctly drive the vehicle to the requested destination. This is a known issue and will be addressed in a future version of the Scenario Runner.
