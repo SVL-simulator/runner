@@ -31,7 +31,7 @@ Scenario Runner is delivered as a zip archive with the following directory layou
 ```
 scenic-lgsvl-2020.04-rc1
 ├── docker
-│   └── scenic_runner-2020.04-rc1.tar
+│   └── lgsvl-simulator-scenarios-runner-latest.tar
 ├── docs
 │ ├── images
 │ └── README.md
@@ -43,13 +43,18 @@ scenic-lgsvl-2020.04-rc1
 │   ├── gomentum-pedestrian-yield
 │   │   └── gomentum-pedestrian-yield.sc
 │   ├── maps
-│   │   ├── BorregasAve.xodr
-│   │   ├── GoMentum.xodr
-│   │   ├── SanFrancisco.xodr
-│   │   ├── Shalun.xodr
-│   │   └── Straight2LaneSame.xodr
-│   ├── random-placement
-│   │   └── scenic-example.sc
+│   │   ├── BorregasAve
+│   │   │   └── borregasave.xodr
+│   │   ├── GoMentum
+│   │   │   └── GoMentum.xodr
+│   │   ├── SanFrancisco
+│   │   │   └── SanFrancisco.xodr
+│   │   ├── Shalun
+│   │   │   └── shalun.xodr
+│   │   └── Straight2LaneSame
+│   │       └── shalun.xodr
+│   └── random-placement
+│       └── scenic-example.sc
 └── scenic_lgsvl.sh
 ```
 
