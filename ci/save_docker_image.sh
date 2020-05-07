@@ -15,6 +15,11 @@ TARBALL_NAME=$(echo "${DST_IMAGE}:${TAG}" | tr ':/' '-')
 
 TARBALL_PATH="${OUTPUT_FOLDER}/${TARBALL_NAME}.tar"
 
+if [ -n "${FAST_RELEASE:-}" ]; then
+    touch ${TARBALL_PATH}-placeholder
+    exit 0
+fi
+
 docker history ${SOURCE_IMAGE} > /dev/null 2>&1  || \
 (
     set +x

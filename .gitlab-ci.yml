@@ -10,56 +10,42 @@ variables:
   TESTENV_IMAGE: "${CI_REGISTRY_IMAGE}/testenv:${CI_PIPELINE_ID}"
 
 before_script:
-  - which docker && test -n "${CI_BUILD_TOKEN}" && docker login -u ${CI_REGISTRY_USER} -p ${CI_BUILD_TOKEN} ${CI_REGISTRY}
+  - set -u
+  - (which docker && docker login -u ${CI_REGISTRY_USER} -p ${CI_BUILD_TOKEN} ${CI_REGISTRY}) || true
   - export GIT_PRETTY_REF=`git describe --always --tag`
 
-build-image-latest:
+#######################
+# Base Job definitions
+#######################
+.docker-image: &docker-image
     stage: build
     script:
-        - ./ci/update-docker-image-ref.sh scripts/scenic_lgsvl.sh ${CI_REGISTRY_IMAGE}:latest
-        - docker build -f docker/Dockerfile -t ${CI_REGISTRY_IMAGE}:latest --label com.lgsvlsimulator.scenarios_runner.build_ref=${GIT_PRETTY_REF} .
-        - docker push ${CI_REGISTRY_IMAGE}:latest
-    only:
-        - master
-        - ci-master
+        - export TAGGED_IMAGE=${CI_REGISTRY_IMAGE}:${IMAGE_TAG}-${FLAVOR}
+        - docker build -f docker/Dockerfile.${FLAVOR} -t ${TAGGED_IMAGE} --label com.lgsvlsimulator.scenarios_runner.build_ref=${GIT_PRETTY_REF} .
+        - docker push ${TAGGED_IMAGE}
     tags:
         - docker
 
-build-image-branch:
-    stage: build
-    script:
-        - ./ci/update-docker-image-ref.sh scripts/scenic_lgsvl.sh ${CI_REGISTRY_IMAGE}/${CI_COMMIT_REF_SLUG}:latest
-        - docker build -f docker/Dockerfile -t ${CI_REGISTRY_IMAGE}/${CI_COMMIT_REF_SLUG}:latest --label com.lgsvlsimulator.scenarios_runner.build_ref=${GIT_PRETTY_REF} .
-        - docker push ${CI_REGISTRY_IMAGE}/${CI_COMMIT_REF_SLUG}:latest
+.docker-image-latest: &docker-image-latest
+    <<: *docker-image
     only:
-        - branches
+        - master
+        - ci-master
+
+.docker-image-tag: &docker-image-tag
+    <<: *docker-image
+    only:
+        - tags
+
+.docker-image-branch: &docker-image-branch
+    <<: *docker-image
     except:
         - master
         - ci-master
-    tags:
-        - docker
-
-build-image-tag:
-    stage: build
-    script:
-        - ./ci/update-docker-image-ref.sh scripts/scenic_lgsvl.sh ${CI_REGISTRY_IMAGE}:${CI_COMMIT_TAG}
-        - docker build -f docker/Dockerfile -t ${CI_REGISTRY_IMAGE}:${CI_COMMIT_TAG} --label com.lgsvlsimulator.scenarios_runner.build_ref=${GIT_PRETTY_REF} .
-        - docker push ${CI_REGISTRY_IMAGE}:${CI_COMMIT_TAG}
     only:
-        - tags
-    tags:
-        - docker
+        - branch
 
-build-test-image:
-    stage: build
-    script:
-        - docker build -f docker/Dockerfile -t ${CI_REGISTRY_IMAGE}/base .
-        - docker build -f docker/Dockerfile.devenv -t ${TESTENV_IMAGE} --build-arg BASE_IMAGE=${CI_REGISTRY_IMAGE}/base .
-        - docker push ${TESTENV_IMAGE}
-    tags:
-        - docker
-
-pytest:
+.pytest: &pytest
     stage: test
     image: ${TESTENV_IMAGE}
     script:
@@ -67,37 +53,121 @@ pytest:
     tags:
         - docker
 
-make_bundle_latest:
+.bundle: &bundle
     image: docker:git
     stage: make_bundle
     script:
         - apk --no-cach add bash zip tree
-        - ./ci/make_release_bundle.sh latest
-        - mv dist/lgsvlsimulator-scenarios-latest .
+        - docker pull ${CI_REGISTRY_IMAGE}:${IMAGE_TAG}
+        - ./ci/make_bundle.sh ${IMAGE_TAG} ${CI_REGISTRY_IMAGE} ${FLAVOR}
+        - mv dist/lgsvlsimulator-scenarios-${IMAGE_TAG} .
     artifacts:
-        name: "lgsvlsimulator-scenarios-latest-$CI_COMMIT_REF_SLUG-$CI_PIPELINE_ID"
+        name: "lgsvlsimulator-scenarios-${IMAGE_TAG}-$CI_COMMIT_REF_SLUG-$CI_PIPELINE_ID"
         paths:
-            - "lgsvlsimulator-scenarios-latest"
+            - "lgsvlsimulator-scenarios-${IMAGE_TAG}"
         expire_in: 1 week
-    only:
-        - master
-        - ci-master
     tags:
         - docker
 
-make_bundle_tag:
-    image: docker:git
-    stage: make_bundle
-    script:
-        - apk --no-cach add bash zip tree
-        - ./ci/make_release_bundle.sh ${CI_COMMIT_TAG}
-        - mv dist/lgsvlsimulator-scenarios-${CI_COMMIT_TAG} .
-    artifacts:
-        name: "lgsvlsimulator-scenarios-${CI_COMMIT_TAG}"
-        paths:
-            - "lgsvlsimulator-scenarios-${CI_COMMIT_TAG}"
-        expire_in: 1 week
+.bundle-latest: &bundle-latest
+    <<: *bundle
+    only:
+        - master
+        - ci-master
+
+.bundle-tag: &bundle-tag
+    <<: *bundle
     only:
         - tags
+
+
+########
+# Jobs
+########
+
+docker-image-latest-scenic:
+    <<: *docker-image-latest
+    variables:
+        FLAVOR: scenic
+        IMAGE_TAG: latest
+
+docker-image-latest-python-api:
+    <<: *docker-image-latest
+    variables:
+        FLAVOR: python-api
+        IMAGE_TAG: latest
+
+docker-image-tag-scenic:
+    <<: *docker-image-tag
+    variables:
+        FLAVOR: scenic
+        IMAGE_TAG: ${CI_COMMIT_TAG}
+
+docker-image-tag-python-api:
+    <<: *docker-image-tag
+    variables:
+        FLAVOR: python-api
+        IMAGE_TAG: ${CI_COMMIT_TAG}
+
+docker-image-branch-scenic:
+    <<: *docker-image-branch
+    variables:
+        FLAVOR: scenic
+        IMAGE_TAG: ${CI_REGISTRY_IMAGE}/${CI_COMMIT_REF_SLUG}:latest-${FLAVOR}
+
+docker-image-branch-python-api:
+    <<: *docker-image-branch
+    variables:
+        FLAVOR: scenic
+        IMAGE_TAG: ${CI_REGISTRY_IMAGE}/${CI_COMMIT_REF_SLUG}:latest-${FLAVOR}
+
+.build-test-image:
+    stage: build
+    script:
+        - docker build -f docker/Dockerfile.scenic -t ${CI_REGISTRY_IMAGE}/base-scenic .
+        - docker build -f docker/Dockerfile.devenv -t ${TESTENV_IMAGE}-scenic --build-arg BASE_IMAGE=${CI_REGISTRY_IMAGE}/base-scenic .
+        - docker push ${TESTENV_IMAGE}-scenic
+        - docker build -f docker/Dockerfile.python-api -t ${CI_REGISTRY_IMAGE}/base-python-api .
+        - docker build -f docker/Dockerfile.devenv -t ${TESTENV_IMAGE}-python-api --build-arg BASE_IMAGE=${CI_REGISTRY_IMAGE}/base-python-api .
+        - docker push ${TESTENV_IMAGE}-python-api
     tags:
         - docker
+    except:
+        - ci-master
+
+
+.pytest-scenic:
+    <<: *pytest
+    image: ${TESTENV_IMAGE}-scenic
+    except:
+        - ci-master
+
+.pytest-python-api:
+    <<: *pytest
+    image: ${TESTENV_IMAGE}-python-api
+    except:
+        - ci-master
+
+bundle-latest-scenic:
+    <<: *bundle-latest
+    variables:
+        FLAVOR: scenic
+        IMAGE_TAG: latest-${FLAVOR}
+
+bundle-latest-python-api:
+    <<: *bundle-latest
+    variables:
+        FLAVOR: python-api
+        IMAGE_TAG: latest-${FLAVOR}
+
+bundle-tag-scenic:
+    <<: *bundle-tag
+    variables:
+        FLAVOR: scenic
+        IMAGE_TAG: ${CI_COMMIT_TAG}-${FLAVOR}
+
+bundle-tag-python-api:
+    <<: *bundle-tag
+    variables:
+        FLAVOR: python-api
+        IMAGE_TAG: ${CI_COMMIT_TAG}-${FLAVOR}
