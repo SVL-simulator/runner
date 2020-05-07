@@ -47,6 +47,26 @@ then run python script with scenic_lgsvl.sh
 scenic_lgsvl.sh python scenario_2_1_simulator_Apollo.py
 ```
 
+## Get development environment from source
+
+* To get a fresh clone:
+
+```
+    $ git clone --recursive git@auto-gitlab.lgsvl.net:HDRP/Scenarios/runner.git
+    $ cd runner
+    $ make build
+    $ make devenv
+```
+
+* To upadate existing workcopy:
+
+```
+    $ cd runner
+    $ git submodule init &&	git submodule update
+    $ make build
+    $ make devenv
+```
+
 ## Known issues/limitations
 
 * You have to go inside the specific scenario folder.
