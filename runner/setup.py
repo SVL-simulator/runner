@@ -15,7 +15,11 @@ setup(
             'run = scenario_runner:main',
         ],
     },
-    install_requires=["lgsvl", "scenic", "verifai"],
+    install_requires=["lgsvl", ],
+    extras_require = {
+        "scenic":  ["scenic", "verifai"],
+    },
+
     license="Other",
     classifiers=[
         "License :: Other/Proprietary License",

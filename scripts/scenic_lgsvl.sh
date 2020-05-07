@@ -30,7 +30,7 @@ R=$(readlink -f "$(dirname $0)")
 
 load_docker_image $SCENIC_LGSVL_IMAGE ${R}/docker
 
-function run_scenic_container() {
+function run_container() {
     if [ ${#@} == 0 ]; then
         echo "I: Running interactive shell"
         ARGS=bash
@@ -57,7 +57,7 @@ function run_scenic_container() {
         -e SIMULATOR_PORT=${SIMULATOR_PORT} \
         -e BRIDGE_HOST=${BRIDGE_HOST} \
         -e BRIDGE_PORT=${BRIDGE_PORT} \
-        -e debian_chroot=RUN_SCENIC \
+        -e debian_chroot=RUN_SCENARIO \
         ${MOUNT_SCENARIOS_DIR} \
         ${SCENIC_LGSVL_IMAGE} \
         ${ARGS}
@@ -129,10 +129,10 @@ case "${1:-}" in
         ;;
     "run")
         shift
-        run_scenic_container run $@
+        run_container run $@
         ;;
     *)
-        run_scenic_container $@
+        run_container $@
         ;;
 esac
 

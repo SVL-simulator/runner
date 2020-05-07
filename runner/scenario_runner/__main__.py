@@ -5,7 +5,15 @@ import argparse
 import os
 import sys
 
-from .run_scenic import run_scenic, check_scenic
+try:
+    import scenic
+    HAVE_SCENIC=True
+except ModuleNotFoundError:
+    HAVE_SCENIC=False
+
+if HAVE_SCENIC:
+    from .run_scenic import run_scenic, check_scenic
+
 from .run_python import run_python
 
 import logging
@@ -35,29 +43,32 @@ def parse_args():
     parser.add_argument('extra_args', metavar='ARGS', type=str, nargs='*',
                         help='(optional) Extra arguments for scenario.')
 
-    parser.add_argument("--num-iterations", '-i', type=int,
-                        default=42,
-                        help="Number of scenario iterations. (default: %(default)s)")
+    global HAVE_SCENIC
 
-    parser.add_argument("--duration", '-d', type=float,
-                        default=20.,
-                        help="Scenario duration in seconds. (default: %(default)s)")
+    if HAVE_SCENIC:
+        parser.add_argument("--num-iterations", '-i', type=int,
+                            default=42,
+                            help="Number of scenario iterations. (default: %(default)s)")
 
-    parser.add_argument("--lgsvl-map", '-m', metavar="MAP_NAME", type=str,
-                        default="GoMentum",
-                        help="Map (default:  %(default)s)")
+        parser.add_argument("--duration", '-d', type=float,
+                            default=20.,
+                            help="Scenario duration in seconds. (default: %(default)s)")
 
-    parser.add_argument("--output-dir", '-O', metavar="OUTPUT_DIR", type=str,
-                        default=None,
-                        help="Default results output folder.")
+        parser.add_argument("--lgsvl-map", '-m', metavar="MAP_NAME", type=str,
+                            default="GoMentum",
+                            help="Map (default:  %(default)s)")
 
-    parser.add_argument("--sampler", '-s', action='store_true',
-                        default=False,
-                        help="Save sampler data after simulation is finished.")
+        parser.add_argument("--output-dir", '-O', metavar="OUTPUT_DIR", type=str,
+                            default=None,
+                            help="Default results output folder.")
 
-    parser.add_argument("--check", '-t', action='store_true',
-                        default=False,
-                        help="Parse scenic files and exits")
+        parser.add_argument("--sampler", '-s', action='store_true',
+                            default=False,
+                            help="Save sampler data after simulation is finished.")
+
+        parser.add_argument("--check", '-t', action='store_true',
+                            default=False,
+                            help="Parse scenic files and exits")
 
     return parser.parse_args()
 
@@ -67,7 +78,13 @@ def main():
 
     setup_log_levels()
 
-    if args.scenario_file[-3:] == ".sc":
+    if not os.path.exists(args.scenario_file):
+        log.error("Can't find file %s", args.scenario_file)
+        return 1
+
+    global HAVE_SCENIC
+
+    if HAVE_SCENIC and args.scenario_file[-3:] == ".sc":
         if args.check:
             try:
                 check_scenic(args.scenario_file)
@@ -86,4 +103,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
