@@ -1,29 +1,57 @@
 version: "3.3"
 services:
-    base:
+    base-python-api:
         build:
             context: ..
-            dockerfile: docker/Dockerfile
+            dockerfile: docker/Dockerfile.python-api
             labels:
                 com.lgsvlsimulator.scenarios_runner.build_ref: ${BUILD_REF}
-        image: scenario-runner-base
+        image: scenario-runner-pythom-api-base
 
-    devenv:
+    base-scenic:
+        build:
+            context: ..
+            dockerfile: docker/Dockerfile.scenic
+            labels:
+                com.lgsvlsimulator.scenarios_runner.build_ref: ${BUILD_REF}
+        image: scenario-runner-scenic-base
+
+    devenv-scenic:
         build:
             context: ..
             dockerfile: docker/Dockerfile.devenv
             args:
-                BASE_IMAGE: scenario-runner-base
+                BASE_IMAGE: scenario-runner-scenic-base
 
         working_dir: /src
         network_mode: host
         volumes:
             - ..:/src:ro
         environment:
+            - debian_chroot=DEVENV_SCENIC
             - SIMULATOR_HOST
             - SIMULATOR_PORT
             - BRIDGE_HOST
             - BRIDGE_PORT
             - "PYTHONPATH=/src/runner:/src/externals/Scenic/src:/src/externals/PythonApi:/src/externals/VerifAI:/src/externals/dreamview-cyber"
+
+    devenv-python-api:
+        build:
+            context: ..
+            dockerfile: docker/Dockerfile.devenv
+            args:
+                BASE_IMAGE: scenario-runner-pythom-api-base
+
+        working_dir: /src
+        network_mode: host
+        volumes:
+            - ..:/src:ro
+        environment:
+            - debian_chroot=DEVENV_PYTHON_API
+            - SIMULATOR_HOST
+            - SIMULATOR_PORT
+            - BRIDGE_HOST
+            - BRIDGE_PORT
+            - "PYTHONPATH=/src/runner:/src/externals/PythonApi:/src/externals/dreamview-cyber"
 
 

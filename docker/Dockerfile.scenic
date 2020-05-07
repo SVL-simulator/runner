@@ -27,8 +27,3 @@ RUN apt-get update \
         libxext6 \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
-
-COPY docker/get_scenic_lgsvl /opt/scenic_lgsvl/
-COPY scripts/scenic_lgsvl.sh /opt/scenic_lgsvl/
-
-RUN chmod +x /opt/scenic_lgsvl/get_scenic_lgsvl && ln -s /opt/scenic_lgsvl/get_scenic_lgsvl /usr/bin
