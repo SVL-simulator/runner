@@ -13,11 +13,19 @@ export BUILD_REF
 build-base:
 	docker build -f docker/Dockerfile -t local/scenic_runner_base .
 
+build-python-api:
+	docker build -f docker/Dockerfile.python-api -t local/python_api_runner_base .
+
 build-devenv: build-base
 	docker build -f docker/Dockerfile.devenv --build-arg BASE_IMAGE=local/scenic_runner_base -t local/scenic_runner_devenv .
 
-build:
+build: compose-build list-devenv-images
+
+compose-build:
 	${COMPOSE} build
+
+list-devenv-images:
+	@docker images | grep -E "^REPOSITORY|^${COMPOSE_PROJECT_NAME}"
 
 shell:
 	./scripts/scenic_lgsvl.sh
@@ -28,8 +36,13 @@ env:
 run-help:
 	./scripts/scenic_lgsvl.sh run --help
 
-devenv:
-	${COMPOSE} run --rm devenv /bin/bash
+devenv: devenv-scenic
+
+devenv-scenic:
+	${COMPOSE} run --rm devenv-scenic /bin/bash
+
+devenv-python-api:
+	${COMPOSE} run --rm devenv-python-api /bin/bash
 
 cleanup:
 	${COMPOSE} rm
@@ -53,3 +66,18 @@ inspect-labels:
 
 version:
 	./scripts/scenic_lgsvl.sh version
+
+bundles-fast:
+	export FAST_RELEASE=1 \
+		&& ./ci/make_bundle.sh latest-scenic auto-gitlab.lgsvl.net:4567/hdrp/scenarios/runner scenic \
+		&& ./ci/make_bundle.sh latest-python-api auto-gitlab.lgsvl.net:4567/hdrp/scenarios/runner python-api
+
+bundles:
+	docker pull auto-gitlab.lgsvl.net:4567/hdrp/scenarios/runner:latest-scenic
+	docker pull auto-gitlab.lgsvl.net:4567/hdrp/scenarios/runner:latest-python-api
+	./ci/make_bundle.sh latest-scenic auto-gitlab.lgsvl.net:4567/hdrp/scenarios/runner scenic
+	./ci/make_bundle.sh latest-scenic auto-gitlab.lgsvl.net:4567/hdrp/scenarios/runner python-api
+
+push-ci-trybyild:
+	git push origin -f  HEAD:ci-master && git push origin -f && git tag -f CI-TAG && git push origin -f CI-TAG
+	@echo "\r\nURL https://auto-gitlab.lgsvl.net/HDRP/Scenarios/runner/pipelines"
