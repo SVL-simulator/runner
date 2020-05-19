@@ -54,17 +54,20 @@ function export_runner_script_python-api {
 
 
 function copy_scenarios {
+    mkdir -p $DIST_PATH/scenarios
     copy_scenarios_${BUNDLE_FLAVOR}
 }
 
 function copy_scenarios_scenic {
-    test -d scenarios || (echo "E: Can't find scenarios"; exit 1)
-    cp -r scenarios $DIST_PATH
+    test -d scenarios/Scenic || (echo "E: Can't find Scenic scenarios"; exit 1)
+    cp -r scenarios/Scenic/* $DIST_PATH/scenarios
 }
 
 function copy_scenarios_python-api {
-    mkdir -p $DIST_PATH/scenarios
     cp -r externals/PythonApi/examples/NHTSA-sample-tests $DIST_PATH/scenarios/NHTSA-sample-tests
+
+    test -d scenarios/Python || (echo "E: Can't find Python scenarios"; exit 1)
+    cp -r scenarios/Python/* $DIST_PATH/scenarios
 }
 
 function copy_docs {
