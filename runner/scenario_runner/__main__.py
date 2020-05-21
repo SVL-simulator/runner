@@ -104,7 +104,7 @@ def main():
             run_scenic(args.scenario_file, args.num_iterations, args.duration, args.lgsvl_map, args.output_dir, args.sampler)
     elif args.scenario_file[-3:] == ".py":
         log.info("Run python script %s", args.scenario_file)
-        run_python(args.scenario_file, args.extra_args)
+        return run_python(args.scenario_file, args.extra_args)
     elif args.scenario_file[-5:] == ".json":
         log.info("Run VSE scenario %s", args.scenario_file)
         duration = getattr(args, 'duration', 0.0)

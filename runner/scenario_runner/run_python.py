@@ -12,4 +12,4 @@ def run_python(filename, extra_args):
 
     log.debug("Run CMD %s", cmd)
 
-    subprocess.call(cmd)
+    return subprocess.call(cmd)
