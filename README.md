@@ -1,4 +1,4 @@
-# Scenic scenarios runner for LGSL Simulator
+# Scenic scenarios runner for LGSVL Simulator
 
 
 ## Quick start

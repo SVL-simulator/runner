@@ -94,8 +94,8 @@ Important note: command is launched in a singleshot container so scenarios shall
 
 ENVIRONMENT VARIABLES:
 
-    * SIMULATOR_HOST/SIMULATOR_PORT - LGSVL Simulator hostname (default:localhost )
-    * SIMULATOR_HOST/SIMULATOR_PORT - LGSVL Simulator port (default: 8181)
+    * SIMULATOR_HOST - LGSVL Simulator hostname (default:localhost )
+    * SIMULATOR_PORT - LGSVL Simulator port (default: 8181)
     * BRIDGE_HOST - ROS/Apollo bridge hostname (default:localhost)
     * BRIDGE_PORT - ROS/Apollo bridge port (default:9090)
     * SCENARIOS_DIR - host folder to be mounted as /scenarios inside the container

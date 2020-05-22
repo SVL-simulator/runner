@@ -15,6 +15,7 @@ if HAVE_SCENIC:
     from .run_scenic import run_scenic, check_scenic
 
 from .run_python import run_python
+from .run_vse import run_vse
 
 import logging
 
@@ -24,7 +25,10 @@ logging.basicConfig(level=logging.DEBUG, format=FORMAT)
 log = logging.getLogger("scenario_runner")
 
 
-def setup_log_levels():
+def setup_log_levels(log_level):
+    log.setLevel(log_level)
+
+    # Reset levels for some chatty modules
     logging.getLogger('matplotlib').setLevel(logging.INFO)
     logging.getLogger('websockets').setLevel(logging.INFO)
     logging.getLogger('selector_events').setLevel(logging.INFO)
@@ -42,6 +46,9 @@ def parse_args():
 
     parser.add_argument('extra_args', metavar='ARGS', type=str, nargs='*',
                         help='(optional) Extra arguments for scenario.')
+
+    parser.add_argument('--log-level', '-L', metavar='LEVEL', type=str,
+                        default='INFO', help="Logging level")
 
     global HAVE_SCENIC
 
@@ -76,7 +83,7 @@ def parse_args():
 def main():
     args = parse_args()
 
-    setup_log_levels()
+    setup_log_levels(args.log_level.upper())
 
     if not os.path.exists(args.scenario_file):
         log.error("Can't find file %s", args.scenario_file)
@@ -98,6 +105,10 @@ def main():
     elif args.scenario_file[-3:] == ".py":
         log.info("Run python script %s", args.scenario_file)
         run_python(args.scenario_file, args.extra_args)
+    elif args.scenario_file[-5:] == ".json":
+        log.info("Run VSE scenario %s", args.scenario_file)
+        duration = getattr(args, 'duration', 0.0)
+        run_vse(args.scenario_file, duration)
     else:
         log.error("Failed to process file of unknown type %s", args.scenario_file)
 
