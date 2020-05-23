@@ -38,20 +38,22 @@ function save_docker_images {
     ${R}/save_docker_image.sh ${DOCKER_RUNNER_IMAGE} $DOCKER_TAG $PUBLIC_IMAGE $DIST_PATH/docker
 }
 
-function export_runner_script {
-    export_runner_script_${BUNDLE_FLAVOR}
+function copy_scripts {
+    copy_scripts_${BUNDLE_FLAVOR}
 }
 
-function export_runner_script_scenic {
+function copy_scripts_scenic {
     cp ./scripts/scenic_lgsvl.sh $DIST_PATH/scenic_lgsvl.sh
     ${R}/update-docker-image-ref.sh $DIST_PATH/scenic_lgsvl.sh ${PUBLIC_IMAGE}:$DOCKER_TAG
 }
 
-function export_runner_script_python-api {
+function copy_scripts_python-api {
     cp ./scripts/scenic_lgsvl.sh $DIST_PATH/lgsvl_scenario.sh
     ${R}/update-docker-image-ref.sh $DIST_PATH/lgsvl_scenario.sh ${PUBLIC_IMAGE}:$DOCKER_TAG
-}
 
+    # TestCase runtime
+    cp ./scripts/install-testcase-runtime.sh $DIST_PATH
+}
 
 function copy_scenarios {
     mkdir -p $DIST_PATH/scenarios
@@ -64,8 +66,6 @@ function copy_scenarios_scenic {
 }
 
 function copy_scenarios_python-api {
-    cp -r externals/PythonApi/examples/NHTSA-sample-tests $DIST_PATH/scenarios/NHTSA-sample-tests
-
     test -d scenarios/Python || (echo "E: Can't find Python scenarios"; exit 1)
     cp -r scenarios/Python/* $DIST_PATH/scenarios
 }
@@ -93,7 +93,7 @@ rm -rf $DIST_PATH
 mkdir -p $DIST_PATH
 
 save_docker_images
-export_runner_script
+copy_scripts
 copy_scenarios
 copy_docs
 

@@ -26,9 +26,11 @@ function load_docker_image {
     fi
 }
 
-R=$(readlink -f "$(dirname $0)")
+R=$(dirname $(readlink -f "$0"))
 
 load_docker_image $SCENIC_LGSVL_IMAGE ${R}/docker
+
+DOCKER_RUN_TTY=--tty
 
 function run_container() {
     if [ ${#@} == 0 ]; then
@@ -48,9 +50,9 @@ function run_container() {
     fi
 
     DOCKER_USER=$(id -u):$(id -g)
-
+    
     exec docker run \
-        --rm --tty --interactive \
+        --rm ${DOCKER_RUN_TTY:-} --interactive \
         --user=${DOCKER_USER} \
         --network=host \
         -e SIMULATOR_HOST=${SIMULATOR_HOST} \
@@ -114,25 +116,40 @@ function cmd_version {
     echo "Build ID:     $(get_image_label 'build_ref')"
 }
 
-case "${1:-}" in
-    "pull")
-        cmd_pull_image
-        ;;
-    "env")
-        cmd_env
-        ;;
-    "help")
-        cmd_help
-        ;;
-    "version")
-        cmd_version
-        ;;
-    "run")
-        shift
-        run_container run $@
-        ;;
-    *)
-        run_container $@
-        ;;
-esac
 
+function test_case_runtime()  {
+    echo "Startin TestCase runtime"
+    printenv | sort | grep -E '^(SIMULATOR|BRIDGE)' || true
+    unset DOCKER_RUN_TTY
+    export SCENARIOS_DIR=${R}/scenarios
+    
+    SIMULATOR_TC_FILENAME=$(echo ${SIMULATOR_TC_FILENAME} | sed 's|^Python/||')
+    
+    run_container run ${SIMULATOR_TC_FILENAME}
+}
+
+if [ -n "${SIMULATOR_TC_RUNTIME:-}" ]; then
+    test_case_runtime
+else
+    case "${1:-}" in
+        "pull")
+            cmd_pull_image
+            ;;
+        "env")
+            cmd_env
+            ;;
+        "help")
+            cmd_help
+            ;;
+        "version")
+            cmd_version
+            ;;
+        "run")
+            shift
+            run_container run $@
+            ;;
+        *)
+            run_container $@
+            ;;
+    esac
+fi
