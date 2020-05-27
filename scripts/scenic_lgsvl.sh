@@ -83,7 +83,7 @@ function cmd_help() {
     CMD=$(basename $0)
 
 cat<<EOF
-Usage: ${CMD} help|version|env|bash|run_scenario|SHELL_COMMAND [ARGS...]
+Usage: ${CMD} help|version|env|bash|run|SHELL_COMMAND [ARGS...]
 
     help          - Show this message
     version       - Version info
@@ -138,7 +138,7 @@ else
         "env")
             cmd_env
             ;;
-        "help")
+        "help"|"--help")
             cmd_help
             ;;
         "version")
