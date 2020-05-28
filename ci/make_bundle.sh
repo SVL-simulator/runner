@@ -71,7 +71,15 @@ function copy_scenarios_python-api {
 }
 
 function copy_docs {
-    cp -r docs $DIST_PATH
+    copy_docs_${BUNDLE_FLAVOR}
+}
+
+function copy_docs_scenic {
+    cp -r docs/Scenic $DIST_PATH/docs
+}
+
+function copy_docs_python-api {
+    cp -r docs/Python $DIST_PATH/docs
 }
 
 function show_tree() {
