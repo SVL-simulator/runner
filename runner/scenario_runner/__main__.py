@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Scenic supervisor controller"""
+"""Scenario supervisor controller"""
 
 import argparse
 import os
@@ -36,21 +36,23 @@ def setup_log_levels(log_level):
 
 
 def parse_args():
-    description = '''Run Scenic scenarios on LGSVL Simulator
-    '''
+    global HAVE_SCENIC
+
+    if HAVE_SCENIC:
+        description = 'Run Scenic scenarios on LGSVL Simulator'
+        scenario_file_description = 'Scenic scenario file'
+    else:
+        description = 'Run Python and VSE-generated scenarios on LGSVL Simulator'
+        scenario_file_description = 'Python (*.py) or VSE JSON (*.json) scenario file'
+
     parser = argparse.ArgumentParser(os.path.basename(sys.argv[0]),
                                      description=description)
 
     parser.add_argument('scenario_file', metavar='SCENARIO_FILE', type=str,
-                        help='Scenic scenario file.')
-
-    parser.add_argument('extra_args', metavar='ARGS', type=str, nargs='*',
-                        help='(optional) Extra arguments for scenario.')
+                        help=scenario_file_description)
 
     parser.add_argument('--log-level', '-L', metavar='LEVEL', type=str,
                         default='INFO', help="Logging level")
-
-    global HAVE_SCENIC
 
     if HAVE_SCENIC:
         parser.add_argument("--num-iterations", '-i', type=int,
@@ -76,6 +78,9 @@ def parse_args():
         parser.add_argument("--check", '-t', action='store_true',
                             default=False,
                             help="Parse scenic files and exits")
+    else:
+        parser.add_argument('extra_args', metavar='ARGS', type=str, nargs='*',
+                            help='(optional) Extra arguments for scenario.')
 
     return parser.parse_args()
 
