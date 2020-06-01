@@ -16,8 +16,8 @@ setup(
         ],
     },
     install_requires=["lgsvl", ],
-    extras_require = {
-        "scenic":  ["scenic", "verifai"],
+    extras_require={
+        "scenic": ["scenic", "verifai"],
     },
 
     license="Other",

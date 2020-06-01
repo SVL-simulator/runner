@@ -6,10 +6,10 @@ import os
 import sys
 
 try:
-    import scenic
-    HAVE_SCENIC=True
+    import scenic  # noqa: F401
+    HAVE_SCENIC = True
 except ModuleNotFoundError:
-    HAVE_SCENIC=False
+    HAVE_SCENIC = False
 
 if HAVE_SCENIC:
     from .run_scenic import run_scenic, check_scenic
