@@ -5,7 +5,6 @@
 # This software contains code licensed as described in LICENSE.
 #
 
-import argparse
 import json
 import logging
 import os
@@ -68,7 +67,7 @@ def add_agent(sim, agent_data, agent_type):
             agent = sim.add_agent(agent_name, agent_type, agent_state, agent_color)
         else:
             agent = sim.add_agent(agent_name, agent_type, agent_state)
-    except:
+    except Exception:
         msg = "Agent not found! Please make sure you have a vehicle named "
         msg += "'{}' or have the correct version of simulator".format(agent_name)
         log.error(msg)
@@ -87,8 +86,13 @@ def load_agents(VSE_dict, sim):
         log.warning("No agents specified in the scenario")
         return
 
-    agent_types = {EGO_TYPE_ID: lgsvl.AgentType.EGO,
-        NPC_TYPE_ID: lgsvl.AgentType.NPC, PEDESTRIAN_TYPE_ID: lgsvl.AgentType.PEDESTRIAN}
+    agent_types = {
+        EGO_TYPE_ID: lgsvl.AgentType.EGO,
+        NPC_TYPE_ID: lgsvl.AgentType.NPC,
+        PEDESTRIAN_TYPE_ID: lgsvl.AgentType.PEDESTRIAN}
+
+    ego_agents = []
+
     agents = {type_id: [] for type_id in agent_types}
     agents_data = VSE_dict["agents"]
 
@@ -98,6 +102,9 @@ def load_agents(VSE_dict, sim):
         if agent_type_id in agent_types:
             agent = add_agent(sim, agent_data, agent_types[agent_type_id])
             agents[agent_type_id].append(agent)
+
+            if isinstance(agent, lgsvl.EgoVehicle):
+                ego_agents.append(agent)
         else:
             log.warning("Unsupported agent type {}".format(agent_data["type"]))
 
@@ -105,20 +112,30 @@ def load_agents(VSE_dict, sim):
     log.info("Loaded {} NPC agents".format(len(agents[NPC_TYPE_ID])))
     log.info("Loaded {} pedestrian agents".format(len(agents[PEDESTRIAN_TYPE_ID])))
 
+    return ego_agents
+
 
 def run_vse(json_file, duration=0.0):
-    log.debug(f"duration is %s", duration)
+    log.debug("duration is %s", duration)
 
     with open(json_file) as f:
         VSE_dict = json.load(f)
 
-    host = os.getenv('SIMULATOR_HOST', "127.0.0.1")
-    port = int(os.getenv('SIMULATOR_PORT', 8181))
-    log.debug("host is {}, port is {}".format(host, port))
-    sim = lgsvl.Simulator(host, port)
+    simulator_host = os.getenv('SIMULATOR_HOST', "127.0.0.1")
+    simulator_port = int(os.getenv('SIMULATOR_PORT', 8181))
+
+    bridge_host = os.environ.get("BRIDGE_HOST", "127.0.0.1")
+    bridge_port = int(os.environ.get("BRIDGE_PORT", 9090))
+
+    log.debug("simulator_host is {}, simulator_port is {}".format(simulator_host, simulator_port))
+    sim = lgsvl.Simulator(simulator_host, simulator_port)
 
     load_scene(VSE_dict, sim)
-    load_agents(VSE_dict, sim)
+    ego_agents = load_agents(VSE_dict, sim)
+
+    if ego_agents:
+        log.info("Setup Ego Vehicle bridge connetion %s:%s", bridge_host, bridge_port)
+        ego_agents[0].connect_bridge(bridge_host, bridge_port)
 
     log.info("Start running scenario...")
     sim.run(duration)
