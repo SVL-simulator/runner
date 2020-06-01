@@ -3,7 +3,7 @@ FROM python:3.6-slim as builder
 ADD externals /app/externals
 WORKDIR /apps
 
-RUN cd /app/externals/dreamview-cyber && python setup.py install
+RUN cd /app/externals/dreamview && python setup.py install
 RUN cd /app/externals/PythonApi && python setup.py install
 
 ADD runner /app/runner
