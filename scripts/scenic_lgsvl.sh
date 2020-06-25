@@ -50,7 +50,7 @@ function run_container() {
     fi
 
     DOCKER_USER=$(id -u):$(id -g)
-    
+
     exec docker run \
         --rm ${DOCKER_RUN_TTY:-} --interactive \
         --user=${DOCKER_USER} \
@@ -118,13 +118,13 @@ function cmd_version {
 
 
 function test_case_runtime()  {
-    echo "Startin TestCase runtime"
+    echo "Starting TestCase runtime"
     printenv | sort | grep -E '^(SIMULATOR|BRIDGE)' || true
     unset DOCKER_RUN_TTY
     export SCENARIOS_DIR=${R}/scenarios
-    
+
     SIMULATOR_TC_FILENAME=$(echo ${SIMULATOR_TC_FILENAME} | sed 's|^Python/||')
-    
+
     run_container run ${SIMULATOR_TC_FILENAME}
 }
 
