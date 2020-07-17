@@ -33,7 +33,7 @@ services:
             - SIMULATOR_PORT
             - BRIDGE_HOST
             - BRIDGE_PORT
-            - "PYTHONPATH=/src/runner:/src/externals/Scenic/src:/src/externals/PythonApi:/src/externals/VerifAI:/src/externals/dreamview-cyber"
+            - "PYTHONPATH=/src/runner:/src/externals/Scenic/src:/src/externals/PythonApi:/src/externals/VerifAI:/src/externals/dreamview"
 
     devenv-python-api:
         build:
@@ -52,6 +52,6 @@ services:
             - SIMULATOR_PORT
             - BRIDGE_HOST
             - BRIDGE_PORT
-            - "PYTHONPATH=/src/runner:/src/externals/PythonApi:/src/externals/dreamview-cyber"
+            - "PYTHONPATH=/src/runner:/src/externals/PythonApi:/src/externals/dreamview"
 
 
