@@ -67,10 +67,10 @@ def add_agent(sim, agent_data, agent_type):
             agent = sim.add_agent(agent_name, agent_type, agent_state, agent_color)
         else:
             agent = sim.add_agent(agent_name, agent_type, agent_state)
-    except Exception:
-        msg = "Agent not found! Please make sure you have a vehicle named "
-        msg += "'{}' or have the correct version of simulator".format(agent_name)
+    except Exception as e:
+        msg = "Failed to add agent {}, please make sure you have the correct simulator".format(agent_name)
         log.error(msg)
+        log.error("Original exception: " + str(e))
         sys.exit(1)
 
     if agent_type != lgsvl.AgentType.EGO:
