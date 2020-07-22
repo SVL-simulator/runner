@@ -63,6 +63,12 @@ def parse_args():
                             default=20.,
                             help="Scenario duration in seconds. (default: %(default)s)")
 
+        parser.add_argument("--force-duration", '-f', action='store_true',
+                            default=False,
+                            help="Force simulation to end after given duration. \
+                            If not set, simulation will end by given duration or \
+                            at the time when all NPCs' waypoints have been reached.")
+
         parser.add_argument("--lgsvl-map", '-m', metavar="MAP_NAME", type=str,
                             default="GoMentum",
                             help="Map (default:  %(default)s)")
@@ -112,8 +118,7 @@ def main():
         return run_python(args.scenario_file, args.extra_args)
     elif args.scenario_file[-5:] == ".json":
         log.info("Run VSE scenario %s", args.scenario_file)
-        duration = getattr(args, 'duration', 0.0)
-        run_vse(args.scenario_file, duration)
+        run_vse(args.scenario_file, args.duration, args.force_duration)
     else:
         log.error("Failed to process file of unknown type %s", args.scenario_file)
 

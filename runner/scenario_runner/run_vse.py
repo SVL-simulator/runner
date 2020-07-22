@@ -43,6 +43,20 @@ def read_transform(transform_data):
     return transform
 
 
+def read_trigger(trigger_data):
+    effectors_data = trigger_data["effectors"]
+    if len(effectors_data) == 0:
+        return None
+
+    effectors = []
+    for effector_data in effectors_data:
+        effector = lgsvl.TriggerEffector(effector_data["typeName"], effector_data["parameters"])
+        effectors.append(effector)
+    trigger = lgsvl.WaypointTrigger(effectors)
+
+    return trigger
+
+
 def read_waypoints(waypoints_data):
     waypoints = []
     for waypoint_data in waypoints_data:
@@ -50,7 +64,8 @@ def read_waypoints(waypoints_data):
         speed = waypoint_data["speed"]
         angle = lgsvl.Vector.from_json(waypoint_data["angle"])
         wait_time = waypoint_data["wait_time"]
-        waypoint = lgsvl.DriveWaypoint(position, speed, angle=angle, idle=wait_time)
+        trigger = read_trigger(waypoint_data["trigger"])
+        waypoint = lgsvl.DriveWaypoint(position, speed, angle=angle, idle=wait_time, trigger=trigger)
         waypoints.append(waypoint)
 
     return waypoints
@@ -115,7 +130,7 @@ def load_agents(VSE_dict, sim):
     return ego_agents
 
 
-def run_vse(json_file, duration=0.0):
+def run_vse(json_file, duration=0.0, force_duration=False):
     log.debug("duration is %s", duration)
 
     with open(json_file) as f:
@@ -136,6 +151,15 @@ def run_vse(json_file, duration=0.0):
     if ego_agents:
         log.info("Setup Ego Vehicle bridge connetion %s:%s", bridge_host, bridge_port)
         ego_agents[0].connect_bridge(bridge_host, bridge_port)
+
+    def _on_agents_traversed_waypoints():
+        log.info("All agents traversed their waypoints.")
+
+        if not force_duration:
+            log.info("Stopping simulation")
+            sim.stop()
+
+    sim.agents_traversed_waypoints(_on_agents_traversed_waypoints)
 
     log.info("Start running scenario...")
     sim.run(duration)
