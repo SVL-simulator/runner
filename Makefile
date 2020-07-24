@@ -68,9 +68,11 @@ version:
 	./scripts/scenario_runner.sh version
 
 bundles-fast:
-	export FAST_RELEASE=1 \
-		&& ./ci/make_bundle.sh latest-scenic auto-gitlab.lgsvl.net:4567/hdrp/scenarios/runner scenic \
-		&& ./ci/make_bundle.sh latest-python-api auto-gitlab.lgsvl.net:4567/hdrp/scenarios/runner python-api
+	export FAST_RELEASE=1 && ./ci/make_bundle.sh latest-scenic auto-gitlab.lgsvl.net:4567/hdrp/scenarios/runner scenic
+	cd dist/lgsvlsimulator-scenarios-latest-scenic && ../../tests/check-bundle-content.sh scenic
+
+	export FAST_RELEASE=1 && ./ci/make_bundle.sh latest-python-api auto-gitlab.lgsvl.net:4567/hdrp/scenarios/runner python-api
+	cd dist/lgsvlsimulator-scenarios-latest-python-api && ../../tests/check-bundle-content.sh python-api
 
 bundles:
 	docker pull auto-gitlab.lgsvl.net:4567/hdrp/scenarios/runner:latest-scenic
