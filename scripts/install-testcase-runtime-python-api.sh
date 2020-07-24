@@ -11,7 +11,7 @@ function usage {
 }
 
 SUPPORTED_RUNTIMES='pythonAPI pythonApi'
-WRAPPER_SCRIPT=lgsvl_scenario.sh
+WRAPPER_SCRIPT=scenario_runner.sh
 
 if [ ! -x ${SIMULATOR_DIR}/simulator ]; then
     echo "Can't find simulator on ${SIMULATOR_DIR}"

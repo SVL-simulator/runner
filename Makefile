@@ -28,13 +28,13 @@ list-devenv-images:
 	@docker images | grep -E "^REPOSITORY|^${COMPOSE_PROJECT_NAME}"
 
 shell:
-	./scripts/scenic_lgsvl.sh
+	./scripts/scenario_runner.sh
 
 env:
-	./scripts/scenic_lgsvl.sh env
+	./scripts/scenario_runner.sh env
 
 run-help:
-	./scripts/scenic_lgsvl.sh run --help
+	./scripts/scenario_runner.sh run --help
 
 devenv: devenv-scenic
 
@@ -65,7 +65,7 @@ inspect-labels:
 
 
 version:
-	./scripts/scenic_lgsvl.sh version
+	./scripts/scenario_runner.sh version
 
 bundles-fast:
 	export FAST_RELEASE=1 \

@@ -39,6 +39,9 @@ function save_docker_images {
 }
 
 function copy_scripts {
+    cp ./scripts/scenario_runner.sh $DIST_PATH
+    ${R}/update-docker-image-ref.sh $DIST_PATH/scenario_runner.sh ${PUBLIC_IMAGE}:$DOCKER_TAG
+
     copy_scripts_${BUNDLE_FLAVOR}
 
     # TestCase runtime
@@ -46,13 +49,11 @@ function copy_scripts {
 }
 
 function copy_scripts_scenic {
-    cp ./scripts/scenic_lgsvl.sh $DIST_PATH/scenic_lgsvl.sh
-    ${R}/update-docker-image-ref.sh $DIST_PATH/scenic_lgsvl.sh ${PUBLIC_IMAGE}:$DOCKER_TAG
+    ln -s scenario_runner.sh ${DIST_PATH}/scenic_lgsvl.sh
 }
 
 function copy_scripts_python-api {
-    cp ./scripts/scenic_lgsvl.sh $DIST_PATH/lgsvl_scenario.sh
-    ${R}/update-docker-image-ref.sh $DIST_PATH/lgsvl_scenario.sh ${PUBLIC_IMAGE}:$DOCKER_TAG
+    ln -s scenario_runner.sh ${DIST_PATH}/lgsvl_scenario.sh
 }
 
 function copy_scenarios {

@@ -11,9 +11,9 @@ function usage {
 }
 
 SUPPORTED_RUNTIMES='pythonAPI pythonApi scenic vse'
-WRAPPER_SCRIPT=scenic_lgsvl.sh
+WRAPPER_SCRIPT=scenario_runner.sh
 
-if [ ! -x ${SIMULATOR_DIR}/simulator ]; then 
+if [ ! -x ${SIMULATOR_DIR}/simulator ]; then
     echo "Can't find simulator on ${SIMULATOR_DIR}"
     echo
     usage
