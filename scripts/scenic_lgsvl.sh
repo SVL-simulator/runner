@@ -31,19 +31,33 @@ R=$(dirname $(readlink -f "$0"))
 load_docker_image $SCENIC_LGSVL_IMAGE ${R}/docker
 
 DOCKER_RUN_TTY=--tty
+DOCKER_RUN_ARGS=
+
+function prepare_docker_run_args() {
+    while [ -n "${1:-}" ]; do
+        arg=$1
+        shift
+
+        if [[ $arg == *" "* ]]; then
+            DOCKER_RUN_ARGS="${DOCKER_RUN_ARGS} '${arg}'"
+        else
+            DOCKER_RUN_ARGS="${DOCKER_RUN_ARGS} ${arg}"
+        fi
+    done
+}
 
 function run_container() {
     if [ ${#@} == 0 ]; then
         echo "I: Running interactive shell"
-        ARGS=bash
+        prepare_docker_run_args bash
     else
-        ARGS=$@
+        prepare_docker_run_args "$@"
     fi
 
     MOUNT_SCENARIOS_DIR=
 
     if [ "${SCENARIOS_DIR:-none}" != "none" ]; then
-        MOUNT_SCENARIOS_DIR="--volume ${SCENARIOS_DIR}:/scenarios --workdir=/scenarios"
+        MOUNT_SCENARIOS_DIR="--volume '${SCENARIOS_DIR}:/scenarios' --workdir=/scenarios"
     else
         echo "W: SCENARIOS_DIR is not set. scenarios dir is not mounted"
         MOUNT_SCENARIOS_DIR='--workdir=/'
@@ -51,7 +65,7 @@ function run_container() {
 
     DOCKER_USER=$(id -u):$(id -g)
 
-    exec docker run \
+    exec bash -c "docker run \
         --rm ${DOCKER_RUN_TTY:-} --interactive \
         --user=${DOCKER_USER} \
         --network=host \
@@ -62,7 +76,7 @@ function run_container() {
         -e debian_chroot=RUN_SCENARIO \
         ${MOUNT_SCENARIOS_DIR} \
         ${SCENIC_LGSVL_IMAGE} \
-        ${ARGS}
+        ${DOCKER_RUN_ARGS}"
 }
 
 function cmd_env() {
@@ -128,6 +142,7 @@ function test_case_runtime()  {
     run_container run ${SIMULATOR_TC_FILENAME}
 }
 
+
 if [ -n "${SIMULATOR_TC_RUNTIME:-}" ]; then
     test_case_runtime
 else
@@ -146,10 +161,10 @@ else
             ;;
         "run")
             shift
-            run_container run $@
+            run_container run "$@"
             ;;
         *)
-            run_container $@
+            run_container "$@"
             ;;
     esac
 fi
