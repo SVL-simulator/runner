@@ -4,8 +4,8 @@ export COMPOSE_PROJECT_NAME
 COMPOSE:=docker-compose -f docker/docker-compose-dev.yml
 
 
-SCENIC_LGSVL_IMAGE:=scenic_runner_devenv:latest
-export SCENIC_LGSVL_IMAGE
+SCENARIO_RUNNER_IMAGE:=scenic_runner_devenv:latest
+export SCENARIO_RUNNER_IMAGE
 
 BUILD_REF:="devenv-$(shell git describe --always --tag)"
 export BUILD_REF
@@ -61,7 +61,7 @@ submodules-pull-master:
 	git status
 
 inspect-labels:
-	docker inspect --format {{.Config.Labels}} ${SCENIC_LGSVL_IMAGE}
+	docker inspect --format {{.Config.Labels}} ${SCENARIO_RUNNER_IMAGE}
 
 
 version:

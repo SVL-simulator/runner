@@ -40,6 +40,9 @@ function save_docker_images {
 
 function copy_scripts {
     copy_scripts_${BUNDLE_FLAVOR}
+
+    # TestCase runtime
+    cp ./scripts/install-testcase-runtime-${BUNDLE_FLAVOR}.sh $DIST_PATH/install-testcase-runtime.sh
 }
 
 function copy_scripts_scenic {
@@ -50,9 +53,6 @@ function copy_scripts_scenic {
 function copy_scripts_python-api {
     cp ./scripts/scenic_lgsvl.sh $DIST_PATH/lgsvl_scenario.sh
     ${R}/update-docker-image-ref.sh $DIST_PATH/lgsvl_scenario.sh ${PUBLIC_IMAGE}:$DOCKER_TAG
-
-    # TestCase runtime
-    cp ./scripts/install-testcase-runtime.sh $DIST_PATH
 }
 
 function copy_scenarios {
@@ -63,6 +63,7 @@ function copy_scenarios {
 function copy_scenarios_scenic {
     test -d scenarios/Scenic || (echo "E: Can't find Scenic scenarios"; exit 1)
     cp -r scenarios/Scenic/* $DIST_PATH/scenarios
+    cp -r scenarios/Python/SampleTestCases $DIST_PATH/scenarios
 }
 
 function copy_scenarios_python-api {

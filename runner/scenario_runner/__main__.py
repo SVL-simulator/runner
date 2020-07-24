@@ -51,6 +51,9 @@ def parse_args():
     parser.add_argument('scenario_file', metavar='SCENARIO_FILE', type=str,
                         help=scenario_file_description)
 
+    parser.add_argument('extra_args', metavar='ARGS', type=str, nargs='*',
+                        help='(optional) Extra arguments for scenario.')
+
     parser.add_argument('--log-level', '-L', metavar='LEVEL', type=str,
                         default='INFO', help="Logging level")
 
@@ -84,9 +87,6 @@ def parse_args():
         parser.add_argument("--check", '-t', action='store_true',
                             default=False,
                             help="Parse scenic files and exits")
-    else:
-        parser.add_argument('extra_args', metavar='ARGS', type=str, nargs='*',
-                            help='(optional) Extra arguments for scenario.')
 
     return parser.parse_args()
 

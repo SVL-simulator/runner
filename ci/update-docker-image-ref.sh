@@ -9,4 +9,4 @@ DOCKER_IMAGE=$2
 
 test -f "${SCRIPT}"
 
-sed "s|^\(SCENIC_LGSVL_IMAGE_DEFAULT\)=.*|\1=${DOCKER_IMAGE} \# Updated by CI|" -i "${SCRIPT}"
+sed "s|^\(SCENARIO_RUNNER_IMAGE_DEFAULT\)=.*|\1=${DOCKER_IMAGE} \# Updated by CI|" -i "${SCRIPT}"

@@ -3,7 +3,7 @@
 set -eu
 # set -x
 
-SCENIC_LGSVL_IMAGE_DEFAULT=auto-gitlab.lgsvl.net:4567/hdrp/scenarios/runner:latest
+SCENARIO_RUNNER_IMAGE_DEFAULT=auto-gitlab.lgsvl.net:4567/hdrp/scenarios/runner:latest
 
 # Envvar defaults
 SCENARIOS_DIR=${SCENARIOS_DIR:-$(pwd)}
@@ -11,7 +11,7 @@ SIMULATOR_HOST=${SIMULATOR_HOST:-localhost}
 SIMULATOR_PORT=${SIMULATOR_PORT:-8181}
 BRIDGE_HOST=${BRIDGE_HOST:-localhost}
 BRIDGE_PORT=${BRIDGE_PORT:-9090}
-SCENIC_LGSVL_IMAGE=${SCENIC_LGSVL_IMAGE:-${SCENIC_LGSVL_IMAGE_DEFAULT}}
+SCENARIO_RUNNER_IMAGE=${SCENARIO_RUNNER_IMAGE:-${SCENARIO_RUNNER_IMAGE_DEFAULT}}
 
 function load_docker_image {
     IMAGE_NAME=${1}
@@ -28,7 +28,7 @@ function load_docker_image {
 
 R=$(dirname $(readlink -f "$0"))
 
-load_docker_image $SCENIC_LGSVL_IMAGE ${R}/docker
+load_docker_image $SCENARIO_RUNNER_IMAGE ${R}/docker
 
 DOCKER_RUN_TTY=--tty
 DOCKER_RUN_ARGS=
@@ -75,7 +75,7 @@ function run_container() {
         -e BRIDGE_PORT=${BRIDGE_PORT} \
         -e debian_chroot=RUN_SCENARIO \
         ${MOUNT_SCENARIOS_DIR} \
-        ${SCENIC_LGSVL_IMAGE} \
+        ${SCENARIO_RUNNER_IMAGE} \
         ${DOCKER_RUN_ARGS}"
 }
 
@@ -85,12 +85,12 @@ function cmd_env() {
     echo "BRIDGE_HOST=${BRIDGE_HOST}"
     echo "BRIDGE_PORT=${BRIDGE_PORT}"
     echo "SCENARIOS_DIR=${SCENARIOS_DIR}"
-    echo "SCENIC_LGSVL_IMAGE=${SCENIC_LGSVL_IMAGE}"
+    echo "SCENARIO_RUNNER_IMAGE=${SCENARIO_RUNNER_IMAGE}"
 }
 
 function cmd_pull_image() {
-        echo "I: Pulling ${SCENIC_LGSVL_IMAGE}"
-        docker pull ${SCENIC_LGSVL_IMAGE}
+        echo "I: Pulling ${SCENARIO_RUNNER_IMAGE}"
+        docker pull ${SCENARIO_RUNNER_IMAGE}
 }
 
 function cmd_help() {
@@ -123,10 +123,10 @@ EOF
 function cmd_version {
     function get_image_label {
         LABEL=$1
-        docker inspect --format "{{index .Config.Labels \"com.lgsvlsimulator.scenarios_runner.${LABEL}\"}}" ${SCENIC_LGSVL_IMAGE}
+        docker inspect --format "{{index .Config.Labels \"com.lgsvlsimulator.scenarios_runner.${LABEL}\"}}" ${SCENARIO_RUNNER_IMAGE}
     }
 
-    echo "Docker image: ${SCENIC_LGSVL_IMAGE}"
+    echo "Docker image: ${SCENARIO_RUNNER_IMAGE}"
     echo "Build ID:     $(get_image_label 'build_ref')"
 }
 
@@ -135,9 +135,8 @@ function test_case_runtime()  {
     echo "Starting TestCase runtime"
     printenv | sort | grep -E '^(SIMULATOR|BRIDGE)' || true
     unset DOCKER_RUN_TTY
-    export SCENARIOS_DIR=${R}/scenarios
 
-    SIMULATOR_TC_FILENAME=$(echo ${SIMULATOR_TC_FILENAME} | sed 's|^Python/||')
+    SIMULATOR_TC_FILENAME=$(echo ${SIMULATOR_TC_FILENAME} | sed -E 's#^(Python|Scenic)/##')
 
     run_container run ${SIMULATOR_TC_FILENAME}
 }
