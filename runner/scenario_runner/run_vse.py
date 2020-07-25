@@ -43,8 +43,10 @@ def read_transform(transform_data):
     return transform
 
 
-def read_trigger(trigger_data):
-    effectors_data = trigger_data["effectors"]
+def read_trigger(waypoint_data):
+    if "trigger" not in waypoint_data:
+        return None
+    effectors_data = waypoint_data["trigger"]["effectors"]
     if len(effectors_data) == 0:
         return None
 
@@ -64,7 +66,7 @@ def read_waypoints(waypoints_data):
         speed = waypoint_data["speed"]
         angle = lgsvl.Vector.from_json(waypoint_data["angle"])
         wait_time = waypoint_data["wait_time"]
-        trigger = read_trigger(waypoint_data["trigger"])
+        trigger = read_trigger(waypoint_data)
         waypoint = lgsvl.DriveWaypoint(position, speed, angle=angle, idle=wait_time, trigger=trigger)
         waypoints.append(waypoint)
 
