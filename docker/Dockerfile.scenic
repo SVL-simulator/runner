@@ -25,5 +25,6 @@ RUN apt-get update \
         libsm6 \
         libxrender1 \
         libxext6 \
+        libgl1 \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
