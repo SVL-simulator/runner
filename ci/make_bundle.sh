@@ -3,7 +3,7 @@
 set -u
 
 if [ "${#@}" == "0" ]; then
-    echo $(basename $0) DOCKER_TAG [DOCKER_RUNNER_IMAGE [BUNDLE_FLAVOR]]
+    echo $(basename $0) DOCKER_TAG [DOCKER_RUNNER_IMAGE]
     exit 1
 fi
 
@@ -15,23 +15,12 @@ R=$(readlink -f $(dirname $0))
 
 DOCKER_TAG=${1}
 DOCKER_RUNNER_IMAGE=${2:-auto-gitlab.lgsvl.net:4567/hdrp/scenarios/runner}
-BUNDLE_FLAVOR=${3:-scenic}
 
 DIST_IMAGES='runner'
 DIST_NAME=lgsvlsimulator-scenarios-$DOCKER_TAG
 DIST_PATH=$(pwd)/dist/$DIST_NAME
 
 PUBLIC_IMAGE=lgsvl/simulator-scenarios-runner
-
-case "${BUNDLE_FLAVOR}" in
-    "scenic"|"python-api")
-        ;;
-    *)
-        echo "E: Unknown bundle flavor '${BUNDLE_FLAVOR}'"
-        exit 1
-        ;;
-esac
-
 
 function save_docker_images {
     mkdir -p $DIST_PATH/docker
@@ -42,34 +31,15 @@ function copy_scripts {
     cp ./scripts/scenario_runner.sh $DIST_PATH
     ${R}/update-docker-image-ref.sh $DIST_PATH/scenario_runner.sh ${PUBLIC_IMAGE}:$DOCKER_TAG
 
-    copy_scripts_${BUNDLE_FLAVOR}
-
     # TestCase runtime
-    cp ./scripts/install-testcase-runtime-${BUNDLE_FLAVOR}.sh $DIST_PATH/install-testcase-runtime.sh
-}
-
-function copy_scripts_scenic {
-    ln -s scenario_runner.sh ${DIST_PATH}/scenic_lgsvl.sh
-}
-
-function copy_scripts_python-api {
-    ln -s scenario_runner.sh ${DIST_PATH}/lgsvl_scenario.sh
+    # cp ./scripts/install-testcase-runtime.sh $DIST_PATH/install-testcase-runtime.sh
 }
 
 function copy_scenarios {
     mkdir -p $DIST_PATH/scenarios
-    copy_scenarios_${BUNDLE_FLAVOR}
-}
-
-function copy_scenarios_scenic {
-    test -d scenarios/Scenic || (echo "E: Can't find Scenic scenarios"; exit 1)
-    cp -r scenarios/Scenic/* $DIST_PATH/scenarios
-    cp -r scenarios/Python/SampleTestCases $DIST_PATH/scenarios
-}
-
-function copy_scenarios_python-api {
-    test -d scenarios/Python || (echo "E: Can't find Python scenarios"; exit 1)
-    cp -r scenarios/Python/* $DIST_PATH/scenarios
+    cp -r scenarios/Scenic $DIST_PATH/scenarios
+    cp -r scenarios/Python $DIST_PATH/scenarios
+    cp -r scenarios/VSE $DIST_PATH/scenarios
 }
 
 function copy_docs {
@@ -105,7 +75,7 @@ mkdir -p $DIST_PATH
 save_docker_images
 copy_scripts
 copy_scenarios
-copy_docs
+# copy_docs
 
 # Some housekeeping
 find $DIST_PATH -name '.git*' | xargs rm -rf
