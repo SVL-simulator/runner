@@ -32,7 +32,7 @@ function copy_scripts {
     ${R}/update-docker-image-ref.sh $DIST_PATH/scenario_runner.sh ${PUBLIC_IMAGE}:$DOCKER_TAG
 
     # TestCase runtime
-    # cp ./scripts/install-testcase-runtime.sh $DIST_PATH/install-testcase-runtime.sh
+    cp ./scripts/install-testcase-runtime.sh $DIST_PATH/install-testcase-runtime.sh
 }
 
 function copy_scenarios {

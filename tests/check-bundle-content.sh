@@ -24,7 +24,7 @@ function check {
 
 function check_common {
     check "scenario_runner.sh is executible" test -x scenario_runner.sh
-    # check "install-testcase-runtime.sh is executible" test -x install-testcase-runtime.sh
+    check "install-testcase-runtime.sh is executible" test -x install-testcase-runtime.sh
 
     check "Saved docker image present (placeholder)" test -f docker/lgsvl-simulator-scenarios-runner-latest.tar-placeholder || \
     check "Saved docker image present" test -f docker/lgsvl-simulator-scenarios-runner-latest.tar
