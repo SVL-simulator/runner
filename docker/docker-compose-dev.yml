@@ -7,6 +7,7 @@ services:
             labels:
                 com.lgsvlsimulator.scenarios_runner.build_ref: ${BUILD_REF}
         image: scenario-runner
+        network_mode: host
 
     devenv:
         build:
