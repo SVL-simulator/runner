@@ -9,7 +9,6 @@ import json
 import logging
 import os
 import sys
-
 import lgsvl
 
 FORMAT = '%(asctime)-15s [%(levelname)s][%(module)s] %(message)s'
@@ -17,161 +16,213 @@ FORMAT = '%(asctime)-15s [%(levelname)s][%(module)s] %(message)s'
 logging.basicConfig(level=logging.INFO, format=FORMAT)
 log = logging.getLogger(__name__)
 
-EGO_TYPE_ID = 1
-NPC_TYPE_ID = 2
-PEDESTRIAN_TYPE_ID = 3
 
+class VSERunner:
+    def __init__(self, json_file):
+        with open(json_file) as f:
+            self.VSE_dict = json.load(f)
 
-def load_scene(VSE_dict, sim):
-    if "map" not in VSE_dict.keys():
-        log.error("No map specified in the scenario")
-        sys.exit(1)
+        self.sim = None
+        self.ego_agents = []
+        self.npc_agents = []
+        self.pedestrian_agents = []
 
-    scene = VSE_dict["map"]["name"]
-    log.info("Loading {} map".format(scene))
-    if sim.current_scene == scene:
-        sim.reset()
-    else:
-        sim.load(scene)
+    def setup_sim(self, default_host="127.0.0.1", default_port=8181):
+        simulator_host = os.getenv('SIMULATOR_HOST', default_host)
+        simulator_port = int(os.getenv('SIMULATOR_PORT', default_port))
+        log.debug("simulator_host is {}, simulator_port is {}".format(simulator_host, simulator_port))
+        self.sim = lgsvl.Simulator(simulator_host, simulator_port)
 
+    def connect_bridge(self, ego_agent, default_host="127.0.0.1", default_port=9090):
+        bridge_host = os.environ.get("BRIDGE_HOST", default_host)
+        bridge_port = int(os.environ.get("BRIDGE_PORT", default_port))
+        ego_agent.connect_bridge(bridge_host, bridge_port)
 
-def read_transform(transform_data):
-    transform = lgsvl.Transform()
-    transform.position = lgsvl.Vector.from_json(transform_data["position"])
-    transform.rotation = lgsvl.Vector.from_json(transform_data["rotation"])
+        return bridge_host, bridge_port
 
-    return transform
+    def load_scene(self):
+        if "map" not in self.VSE_dict.keys():
+            log.error("No map specified in the scenario.")
+            sys.exit(1)
 
-
-def read_trigger(waypoint_data):
-    if "trigger" not in waypoint_data:
-        return None
-    effectors_data = waypoint_data["trigger"]["effectors"]
-    if len(effectors_data) == 0:
-        return None
-
-    effectors = []
-    for effector_data in effectors_data:
-        effector = lgsvl.TriggerEffector(effector_data["typeName"], effector_data["parameters"])
-        effectors.append(effector)
-    trigger = lgsvl.WaypointTrigger(effectors)
-
-    return trigger
-
-
-def read_waypoints(waypoints_data):
-    waypoints = []
-    for waypoint_data in waypoints_data:
-        position = lgsvl.Vector.from_json(waypoint_data["position"])
-        speed = waypoint_data["speed"]
-        angle = lgsvl.Vector.from_json(waypoint_data["angle"])
-        wait_time = waypoint_data["wait_time"]
-        trigger = read_trigger(waypoint_data)
-        waypoint = lgsvl.DriveWaypoint(position, speed, angle=angle, idle=wait_time, trigger=trigger)
-        waypoints.append(waypoint)
-
-    return waypoints
-
-
-def add_agent(sim, agent_data, agent_type):
-    agent_name = agent_data["variant"]
-    agent_state = lgsvl.AgentState()
-    agent_state.transform = read_transform(agent_data["transform"])
-
-    try:
-        if agent_type == lgsvl.AgentType.NPC and "color" in agent_data:
-            agent_color = lgsvl.Vector.from_json(agent_data["color"])
-            agent = sim.add_agent(agent_name, agent_type, agent_state, agent_color)
+        scene = self.VSE_dict["map"]["name"]
+        log.info("Loading {} map.".format(scene))
+        if self.sim.current_scene == scene:
+            self.sim.reset()
         else:
-            agent = sim.add_agent(agent_name, agent_type, agent_state)
-    except Exception as e:
-        msg = "Failed to add agent {}, please make sure you have the correct simulator".format(agent_name)
-        log.error(msg)
-        log.error("Original exception: " + str(e))
-        sys.exit(1)
+            self.sim.load(scene)
 
-    if agent_type != lgsvl.AgentType.EGO:
-        waypoints = read_waypoints(agent_data["waypoints"])
-        if waypoints:
-            agent.follow(waypoints)
+    def load_agents(self):
+        if "agents" not in self.VSE_dict.keys():
+            log.warning("No agents specified in the scenario")
+            return
 
-    return agent
+        agents_data = self.VSE_dict["agents"]
+        for agent_data in agents_data:
+            log.debug("Adding agent {}, type: {}".format(agent_data["variant"], agent_data["type"]))
+            agent_type_id = agent_data["type"]
+            if agent_type_id == lgsvl.AgentType.EGO.value:
+                self.ego_agents.append(agent_data)
 
+            elif agent_type_id == lgsvl.AgentType.NPC.value:
+                self.npc_agents.append(agent_data)
 
-def load_agents(VSE_dict, sim):
-    if "agents" not in VSE_dict.keys():
-        log.warning("No agents specified in the scenario")
-        return
+            elif agent_type_id == lgsvl.AgentType.PEDESTRIAN.value:
+                self.pedestrian_agents.append(agent_data)
 
-    agent_types = {
-        EGO_TYPE_ID: lgsvl.AgentType.EGO,
-        NPC_TYPE_ID: lgsvl.AgentType.NPC,
-        PEDESTRIAN_TYPE_ID: lgsvl.AgentType.PEDESTRIAN}
+            else:
+                log.warning("Unsupported agent type {}. Skipping agent.".format(agent_data["type"]))
 
-    ego_agents = []
+        log.info("Loaded {} ego agents".format(len(self.ego_agents)))
+        log.info("Loaded {} NPC agents".format(len(self.npc_agents)))
+        log.info("Loaded {} pedestrian agents".format(len(self.pedestrian_agents)))
 
-    agents = {type_id: [] for type_id in agent_types}
-    agents_data = VSE_dict["agents"]
+    def add_ego(self):
+        for i, agent in enumerate(self.ego_agents):
+            agent_name = agent["variant"]
+            agent_state = lgsvl.AgentState()
+            agent_state.transform = self.read_transform(agent["transform"])
+            agent_color = lgsvl.Vector.from_json(agent["color"]) if "color" in agent else None
+            agent_destination = lgsvl.Vector(
+                agent["destinationPoint"]["position"]["x"],
+                agent["destinationPoint"]["position"]["y"],
+                agent["destinationPoint"]["position"]["z"]
+            )
+            agent_destination_rotation = lgsvl.Vector(
+                agent["destinationPoint"]["rotation"]["x"],
+                agent["destinationPoint"]["rotation"]["y"],
+                agent["destinationPoint"]["rotation"]["z"],
+            )
 
-    for agent_data in agents_data:
-        log.debug("Adding agent {}, type: {}".format(agent_data["variant"], agent_data["type"]))
-        agent_type_id = agent_data["type"]
-        if agent_type_id in agent_types:
-            agent = add_agent(sim, agent_data, agent_types[agent_type_id])
-            agents[agent_type_id].append(agent)
+            try:
+                ego = self.sim.add_agent(agent_name, lgsvl.AgentType.EGO, agent_state, agent_color)
+            except Exception as e:
+                msg = "Failed to add agent {}, please make sure you have the correct simulator".format(agent_name)
+                log.error(msg)
+                log.error("Original exception: " + str(e))
+                sys.exit(1)
 
-            if isinstance(agent, lgsvl.EgoVehicle):
-                ego_agents.append(agent)
-        else:
-            log.warning("Unsupported agent type {}".format(agent_data["type"]))
+            # Only connecting the first agent to the bridge since we only have one environment variable
+            if i == 0:
+                try:
+                    bridge_host = self.connect_bridge(ego)[0]
+                    modules = ['Localization', 'Transform', 'Routing', 'Prediction', 'Planning', 'Control']  # , 'Perception', 'Traffic Light']
+                    dv = lgsvl.dreamview.Connection(self.sim, ego, bridge_host)
+                    dv.set_hd_map(os.environ.get("LGSVL_AUTOPILOT_HD_MAP", "Borregas Ave"))
+                    dv.set_vehicle(os.environ.get("LGSVL_AUTOPILOT_0_VEHICLE_CONFIG", 'Lincoln2017MKZ'))
+                    dv.setup_apollo(agent_destination.x, agent_destination.z, modules)
+                except Exception as e:
+                    msg = "Somthing went wrong with bridge / dreamview connection."
+                    log.error("Original exception: " + str(e))
+                    log.error(msg)
 
-    log.info("Loaded {} ego agents".format(len(agents[EGO_TYPE_ID])))
-    log.info("Loaded {} NPC agents".format(len(agents[NPC_TYPE_ID])))
-    log.info("Loaded {} pedestrian agents".format(len(agents[PEDESTRIAN_TYPE_ID])))
+    def add_npc(self):
+        for agent in self.npc_agents:
+            agent_name = agent["variant"]
+            agent_state = lgsvl.AgentState()
+            agent_state.transform = self.read_transform(agent["transform"])
+            agent_color = lgsvl.Vector.from_json(agent["color"]) if "color" in agent else None
 
-    return ego_agents
+            try:
+                npc = self.sim.add_agent(agent_name, lgsvl.AgentType.NPC, agent_state, agent_color)
+            except Exception as e:
+                msg = "Failed to add agent {}, please make sure you have the correct simulator".format(agent_name)
+                log.error(msg)
+                log.error("Original exception: " + str(e))
+                sys.exit(1)
 
+            if agent["behaviour"]["name"] == "NPCWaypointBehaviour":
+                waypoints = self.read_waypoints(agent["waypoints"])
+                if waypoints:
+                    npc.follow(waypoints)
+            elif agent["behaviour"]["name"] == "NPCLaneFollowBehaviour":
+                npc.follow_closest_lane(
+                    True,
+                    agent["behaviour"]["parameters"]["maxSpeed"],
+                    agent["behaviour"]["parameters"]["isLaneChange"]
+                )
 
-def run_vse(json_file, duration=0.0, force_duration=False):
-    log.debug("duration is %s", duration)
+    def add_pedestrian(self):
+        for agent in self.pedestrian_agents:
+            agent_name = agent["variant"]
+            agent_state = lgsvl.AgentState()
+            agent_state.transform = self.read_transform(agent["transform"])
 
-    with open(json_file) as f:
-        VSE_dict = json.load(f)
+            try:
+                pedestrian = self.sim.add_agent(agent_name, lgsvl.AgentType.PEDESTRIAN, agent_state)
+            except Exception as e:
+                msg = "Failed to add agent {}, please make sure you have the correct simulator".format(agent_name)
+                log.error(msg)
+                log.error("Original exception: " + str(e))
+                sys.exit(1)
 
-    simulator_host = os.getenv('SIMULATOR_HOST', "127.0.0.1")
-    simulator_port = int(os.getenv('SIMULATOR_PORT', 8181))
+            waypoints = self.read_waypoints(agent["waypoints"])
+            if waypoints:
+                pedestrian.follow(waypoints)
 
-    bridge_host = os.environ.get("BRIDGE_HOST", "127.0.0.1")
-    bridge_port = int(os.environ.get("BRIDGE_PORT", 9090))
+    def read_transform(self, transform_data):
+        transform = lgsvl.Transform()
+        transform.position = lgsvl.Vector.from_json(transform_data["position"])
+        transform.rotation = lgsvl.Vector.from_json(transform_data["rotation"])
 
-    log.debug("simulator_host is {}, simulator_port is {}".format(simulator_host, simulator_port))
-    sim = lgsvl.Simulator(simulator_host, simulator_port)
+        return transform
 
-    load_scene(VSE_dict, sim)
-    ego_agents = load_agents(VSE_dict, sim)
+    def read_waypoints(self, waypoints_data):
+        waypoints = []
+        for waypoint_data in waypoints_data:
+            position = lgsvl.Vector.from_json(waypoint_data["position"])
+            speed = waypoint_data["speed"]
+            angle = lgsvl.Vector.from_json(waypoint_data["angle"])
+            wait_time = waypoint_data["wait_time"]
+            trigger = self.read_trigger(waypoint_data)
+            waypoint = lgsvl.DriveWaypoint(position, speed, angle=angle, idle=wait_time, trigger=trigger)
+            waypoints.append(waypoint)
 
-    if ego_agents:
-        log.info("Setup Ego Vehicle bridge connetion %s:%s", bridge_host, bridge_port)
-        ego_agents[0].connect_bridge(bridge_host, bridge_port)
+        return waypoints
 
-    def _on_agents_traversed_waypoints():
-        log.info("All agents traversed their waypoints.")
+    def read_trigger(self, waypoint_data):
+        if "trigger" not in waypoint_data:
+            return None
+        effectors_data = waypoint_data["trigger"]["effectors"]
+        if len(effectors_data) == 0:
+            return None
 
-        if not force_duration:
-            log.info("Stopping simulation")
-            sim.stop()
+        effectors = []
+        for effector_data in effectors_data:
+            effector = lgsvl.TriggerEffector(effector_data["typeName"], effector_data["parameters"])
+            effectors.append(effector)
+        trigger = lgsvl.WaypointTrigger(effectors)
 
-    sim.agents_traversed_waypoints(_on_agents_traversed_waypoints)
+        return trigger
 
-    log.info("Start running scenario...")
-    sim.run(duration)
-    log.info("Simulation ended")
+    def run(self, duration=0.0, force_duration=False):
+        log.debug("Duration is set to {}.".format(duration))
+        self.setup_sim()
+        self.load_scene()
+        self.load_agents()
+        self.add_ego()  # Must go first since dreamview api may call sim.run()
+        self.add_npc()
+        self.add_pedestrian()
+
+        def _on_agents_traversed_waypoints():
+            log.info("All agents traversed their waypoints.")
+
+            if not force_duration:
+                log.info("Stopping simulation")
+                self.sim.stop()
+
+        self.sim.agents_traversed_waypoints(_on_agents_traversed_waypoints)
+
+        log.info("Starting scenario...")
+        self.sim.run(duration)
+        log.info("Scenario simualtion ended.")
 
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        log.error("Input file is not specified, please provide json file.")
+        log.error("Input file is not specified, please provide the scenario JSON file.")
         sys.exit(1)
 
     json_file = sys.argv[1]
-    run_vse(json_file)
+    vse_runner = VSERunner(json_file)
+    vse_runner.run()

@@ -15,7 +15,7 @@ if HAVE_SCENIC:
     from .run_scenic import run_scenic, check_scenic
 
 from .run_python import run_python
-from .run_vse import run_vse
+from .run_vse import VSERunner
 
 import logging
 
@@ -118,7 +118,8 @@ def main():
         return run_python(args.scenario_file, args.extra_args)
     elif args.scenario_file[-5:] == ".json":
         log.info("Run VSE scenario %s", args.scenario_file)
-        run_vse(args.scenario_file, args.duration, args.force_duration)
+        vse_runner = VSERunner(args.scenario_file)
+        vse_runner.run(args.duration, args.force_duration)
     else:
         log.error("Failed to process file of unknown type %s", args.scenario_file)
 
