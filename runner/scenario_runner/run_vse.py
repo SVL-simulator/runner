@@ -77,6 +77,23 @@ class VSERunner:
         log.info("Loaded {} NPC agents".format(len(self.npc_agents)))
         log.info("Loaded {} pedestrian agents".format(len(self.pedestrian_agents)))
 
+    def add_controllables(self):
+        if "controllables" not in self.VSE_dict.keys():
+            log.debug("No controllables specified in the scenarios")
+            return
+
+        controllables_data = self.VSE_dict["controllables"]
+        for controllable_data in controllables_data:
+            log.debug("Adding controllable {}".format(controllable_data["name"]))
+            controllable_state = lgsvl.ObjectState()
+            controllable_state.transform = self.read_transform(controllable_data["transform"])
+            try:
+                self.sim.controllable_add(controllable_data["name"], controllable_state)
+            except Exception as e:
+                msg = "Failed to add controllable {}, please make sure you have the correct simulator".format(controllable_data["name"])
+                log.error(msg)
+                log.error("Original exception: " + str(e))
+
     def add_ego(self):
         for i, agent in enumerate(self.ego_agents):
             agent_name = agent["variant"]
@@ -203,6 +220,7 @@ class VSERunner:
         self.add_ego()  # Must go first since dreamview api may call sim.run()
         self.add_npc()
         self.add_pedestrian()
+        self.add_controllables()
 
         def _on_agents_traversed_waypoints():
             log.info("All agents traversed their waypoints.")
