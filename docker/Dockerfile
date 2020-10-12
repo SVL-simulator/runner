@@ -8,7 +8,6 @@ WORKDIR /apps
 
 RUN cd /app/externals/Scenic && python setup.py install
 RUN cd /app/externals/VerifAI && python setup.py install
-RUN cd /app/externals/dreamview && python setup.py install
 RUN cd /app/externals/PythonApi && python setup.py install
 
 ADD runner /app/runner

@@ -7,9 +7,6 @@
 [submodule "externals/PythonApi"]
 	path = externals/PythonApi
 	url = ../../PythonApi.git
-[submodule "externals/dreamview"]
-	path = externals/dreamview
-	url = ../../../HDRP/dreamview.git
 [submodule "scenarios"]
 	path = scenarios
 	url = ../scenarios.git
