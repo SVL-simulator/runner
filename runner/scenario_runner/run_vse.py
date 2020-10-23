@@ -99,7 +99,6 @@ class VSERunner:
             agent_name = agent["variant"]
             agent_state = lgsvl.AgentState()
             agent_state.transform = self.read_transform(agent["transform"])
-            agent_color = lgsvl.Vector.from_json(agent["color"]) if "color" in agent else None
             agent_destination = lgsvl.Vector(
                 agent["destinationPoint"]["position"]["x"],
                 agent["destinationPoint"]["position"]["y"],
@@ -112,7 +111,7 @@ class VSERunner:
             )
 
             try:
-                ego = self.sim.add_agent(agent_name, lgsvl.AgentType.EGO, agent_state, agent_color)
+                ego = self.sim.add_agent(agent_name, lgsvl.AgentType.EGO, agent_state)
             except Exception as e:
                 msg = "Failed to add agent {}, please make sure you have the correct simulator".format(agent_name)
                 log.error(msg)
@@ -138,7 +137,7 @@ class VSERunner:
             agent_name = agent["variant"]
             agent_state = lgsvl.AgentState()
             agent_state.transform = self.read_transform(agent["transform"])
-            agent_color = lgsvl.Vector.from_json(agent["color"]) if "color" in agent else None
+            agent_color = lgsvl.Vector(agent["color"]["r"], agent["color"]["g"], agent["color"]["b"]) if "color" in agent else None
 
             try:
                 npc = self.sim.add_agent(agent_name, lgsvl.AgentType.NPC, agent_state, agent_color)
