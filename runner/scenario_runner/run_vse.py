@@ -99,16 +99,17 @@ class VSERunner:
             agent_name = agent["variant"]
             agent_state = lgsvl.AgentState()
             agent_state.transform = self.read_transform(agent["transform"])
-            agent_destination = lgsvl.Vector(
-                agent["destinationPoint"]["position"]["x"],
-                agent["destinationPoint"]["position"]["y"],
-                agent["destinationPoint"]["position"]["z"]
-            )
-            agent_destination_rotation = lgsvl.Vector(
-                agent["destinationPoint"]["rotation"]["x"],
-                agent["destinationPoint"]["rotation"]["y"],
-                agent["destinationPoint"]["rotation"]["z"],
-            )
+            if "destinationPoint" in agent:
+                agent_destination = lgsvl.Vector(
+                    agent["destinationPoint"]["position"]["x"],
+                    agent["destinationPoint"]["position"]["y"],
+                    agent["destinationPoint"]["position"]["z"]
+                )
+                agent_destination_rotation = lgsvl.Vector(
+                    agent["destinationPoint"]["rotation"]["x"],
+                    agent["destinationPoint"]["rotation"]["y"],
+                    agent["destinationPoint"]["rotation"]["z"],
+                )
 
             try:
                 ego = self.sim.add_agent(agent_name, lgsvl.AgentType.EGO, agent_state)
@@ -126,7 +127,12 @@ class VSERunner:
                     dv = lgsvl.dreamview.Connection(self.sim, ego, bridge_host)
                     dv.set_hd_map(os.environ.get("LGSVL_AUTOPILOT_HD_MAP", "Borregas Ave"))
                     dv.set_vehicle(os.environ.get("LGSVL_AUTOPILOT_0_VEHICLE_CONFIG", 'Lincoln2017MKZ'))
-                    dv.setup_apollo(agent_destination.x, agent_destination.z, modules)
+                    if "destinationPoint" in agent:
+                        dv.setup_apollo(agent_destination.x, agent_destination.z, modules)
+                    else:
+                        log.info("No destination set for EGO {}".format(agent_name))
+                        for mod in modules:
+                            dv.enable_module(mod)
                 except Exception as e:
                     msg = "Somthing went wrong with bridge / dreamview connection."
                     log.error("Original exception: " + str(e))
