@@ -28,14 +28,14 @@ class VSERunner:
         self.pedestrian_agents = []
 
     def setup_sim(self, default_host="127.0.0.1", default_port=8181):
-        simulator_host = os.getenv('SIMULATOR_HOST', default_host)
-        simulator_port = int(os.getenv('SIMULATOR_PORT', default_port))
+        simulator_host = os.getenv('LGSVL__SIMULATOR_HOST', default_host)
+        simulator_port = int(os.getenv('LGSVL__SIMULATOR_PORT', default_port))
         log.debug("simulator_host is {}, simulator_port is {}".format(simulator_host, simulator_port))
         self.sim = lgsvl.Simulator(simulator_host, simulator_port)
 
     def connect_bridge(self, ego_agent, default_host="127.0.0.1", default_port=9090):
-        bridge_host = os.environ.get("BRIDGE_HOST", default_host)
-        bridge_port = int(os.environ.get("BRIDGE_PORT", default_port))
+        bridge_host = os.environ.get("LGSVL__AUTOPILOT_0_HOST", default_host)
+        bridge_port = int(os.environ.get("LGSVL__AUTOPILOT_0_PORT", default_port))
         ego_agent.connect_bridge(bridge_host, bridge_port)
 
         return bridge_host, bridge_port
