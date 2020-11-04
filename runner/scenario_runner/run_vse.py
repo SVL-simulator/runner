@@ -123,7 +123,23 @@ class VSERunner:
             if i == 0:
                 try:
                     bridge_host = self.connect_bridge(ego)[0]
-                    modules = ['Localization', 'Transform', 'Routing', 'Prediction', 'Planning', 'Control', 'Perception', 'Traffic Light']
+                    default_modules = [
+                        'Localization',
+                        'Perception',
+                        'Transform',
+                        'Routing',
+                        'Prediction',
+                        'Planning',
+                        'Traffic Light',
+                        'Control'
+                    ]
+
+                    try:
+                        modules = env.list("LGSVL__AUTOPILOT_0_VEHICLE_MODULES", subcast=str)
+                        if len(modules) == 0:
+                            modules = default_modules
+                    except Exception:
+                        modules = default_modules
                     dv = lgsvl.dreamview.Connection(self.sim, ego, bridge_host)
                     dv.set_hd_map(os.environ.get("LGSVL_AUTOPILOT_HD_MAP", "Borregas Ave"))
                     dv.set_vehicle(os.environ.get("LGSVL_AUTOPILOT_0_VEHICLE_CONFIG", 'Lincoln2017MKZ'))
