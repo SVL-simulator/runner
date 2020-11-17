@@ -78,6 +78,11 @@ DOCKER_RUN_ENV_VARS=
 # Go through each environment variable in the env_vars array
 # If it has been set, then add it to the list of parameters for the `docker run` command
 function prepare_docker_run_env_vars() {
+    # HACK Temp solution to use old variable
+    if [ -z "${LGSVL__MAP:-}" -a -n "${SIMULATOR_MAP:-}" ]; then
+        LGSVL__MAP=${SIMULATOR_MAP}
+    fi
+
     local var
     for var in ${env_vars[@]}; do
         if [ -n "${!var-}" ]; then
