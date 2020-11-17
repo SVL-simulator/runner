@@ -115,7 +115,10 @@ class VSERunner:
 
     def add_ego(self):
         for i, agent in enumerate(self.ego_agents):
-            agent_name = agent["variant"]
+            if "id" in agent:
+                agent_name = agent["id"]
+            else:
+                agent_name = agent["variant"]
             agent_state = lgsvl.AgentState()
             agent_state.transform = self.read_transform(agent["transform"])
             if "destinationPoint" in agent:
@@ -184,7 +187,10 @@ class VSERunner:
 
     def add_npc(self):
         for agent in self.npc_agents:
-            agent_name = agent["variant"]
+            if "id" in agent:
+                agent_name = agent["id"]
+            else:
+                agent_name = agent["variant"]
             agent_state = lgsvl.AgentState()
             agent_state.transform = self.read_transform(agent["transform"])
             agent_color = lgsvl.Vector(agent["color"]["r"], agent["color"]["g"], agent["color"]["b"]) if "color" in agent else None
@@ -210,7 +216,10 @@ class VSERunner:
 
     def add_pedestrian(self):
         for agent in self.pedestrian_agents:
-            agent_name = agent["variant"]
+            if "id" in agent:
+                agent_name = agent["id"]
+            else:
+                agent_name = agent["variant"]
             agent_state = lgsvl.AgentState()
             agent_state.transform = self.read_transform(agent["transform"])
 
