@@ -67,6 +67,20 @@ scenic_lgsvl.sh python scenario_2_1_simulator_Apollo.py
     $ make devenv
 ```
 
+## Link development environment as simulator scenario runtime
+
+Using `install-testcase-runtime.sh` script:
+
+```shell
+$ ./scripts/install-testcase-runtime.sh /path/to/simulator
+```
+
+By invoking make target:
+
+```shell
+$ make install-runtime-dev SIMULATOR_DIR=/path/to/simulator
+```
+
 ## Known issues/limitations
 
 * You have to go inside the specific scenario folder.

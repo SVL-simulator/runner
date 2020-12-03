@@ -75,12 +75,17 @@ bundles:
 	docker pull auto-gitlab.lgsvl.net:4567/hdrp/scenarios/runner:latest
 	./ci/make_bundle.sh latest auto-gitlab.lgsvl.net:4567/hdrp/scenarios/runner
 
-SIMULATOR_DIR=/home/pieslice/projects/LGE/reviews/simulator-devel
+SIMULATOR_DIR?=/home/user/path/to/simulator
 
-install-runtimes: install-runtime
+.check_simulator_dir:
+	@test -d ${SIMULATOR_DIR} || (echo "E: Can't locate simulator dir at ${SIMULATOR_DIR}. Make sure SIMULATOR_DIR env var points to correct path"; exit 1)
 
-install-runtime:
+install-runtime-dist: .check_simulator_dir
 	./dist/lgsvlsimulator-scenarios-latest/install-testcase-runtime.sh ${SIMULATOR_DIR}
+	tree ${SIMULATOR_DIR}/TestCaseRunner
+
+install-runtime-dev: .check_simulator_dir
+	./scripts/install-testcase-runtime.sh ${SIMULATOR_DIR}
 	tree ${SIMULATOR_DIR}/TestCaseRunner
 
 push-ci-trybyild:
