@@ -112,6 +112,11 @@ function run_container() {
 
     DOCKER_USER=$(id -u):$(id -g)
 
+    echo "Scenario runner image: ${SCENARIO_RUNNER_IMAGE}"
+
+    echo "Simulation environment:"
+    printenv | sort | grep -E '^(SIMULATOR|BRIDGE|LGSVL__)' || true
+
     docker run \
         --rm ${DOCKER_RUN_TTY:-} --interactive \
         --user=${DOCKER_USER} \
@@ -199,7 +204,6 @@ function cmd_version {
 
 function test_case_runtime()  {
     echo "Starting TestCase runtime"
-    printenv | sort | grep -E '^(SIMULATOR|BRIDGE)' || true
     unset DOCKER_RUN_TTY
 
     SIMULATOR_TC_FILENAME=$(echo ${SIMULATOR_TC_FILENAME} | sed -E 's#^(Python|Scenic)/##')
