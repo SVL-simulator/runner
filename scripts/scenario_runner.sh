@@ -81,12 +81,13 @@ function prepare_docker_run_env_vars() {
     # HACK Temp solution to use old variable
     if [ -z "${LGSVL__MAP:-}" -a -n "${SIMULATOR_MAP:-}" ]; then
         LGSVL__MAP=${SIMULATOR_MAP}
+        export LGSVL__MAP
     fi
 
     local var
     for var in ${env_vars[@]}; do
         if [ -n "${!var-}" ]; then
-            DOCKER_RUN_ENV_VARS="${DOCKER_RUN_ENV_VARS} -e $var='${!var}'"
+            DOCKER_RUN_ENV_VARS="${DOCKER_RUN_ENV_VARS} -e $var"
         fi
     done
 }
@@ -133,7 +134,7 @@ function cmd_env() {
     local var
     for var in ${env_vars[@]}; do
         if [ -n "${!var-}" ]; then
-            echo "${var}='${!var}'"
+            echo "${var}=${!var}"
         fi
     done
     echo "SCENARIOS_DIR=${SCENARIOS_DIR}"
