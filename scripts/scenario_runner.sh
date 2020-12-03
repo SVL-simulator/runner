@@ -3,8 +3,7 @@
 set -eu
 # set -x
 
-# Value is updated by Gitlab CI
-SCENARIO_RUNNER_IMAGE_DEFAULT=auto-gitlab.lgsvl.net:4567/hdrp/scenarios/runner:latest
+SCENARIO_RUNNER_IMAGE_DEFAULT=auto-gitlab.lgsvl.net:4567/hdrp/scenarios/runner:dev
 
 # Envvar defaults
 env_vars=(

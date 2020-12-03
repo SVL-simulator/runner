@@ -23,9 +23,10 @@ build: compose-build list-devenv-images
 
 compose-build:
 	${COMPOSE} build
+	docker tag scenario-runner:latest auto-gitlab.lgsvl.net:4567/hdrp/scenarios/runner:dev
 
 list-devenv-images:
-	@docker images | grep -E "^REPOSITORY|^${COMPOSE_PROJECT_NAME}"
+	@docker images | grep -E "^REPOSITORY|^${COMPOSE_PROJECT_NAME}|hdrp/scenarios/runner|^scenario-runner"
 
 
 docker-latest-rel:
