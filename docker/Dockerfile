@@ -6,6 +6,12 @@ RUN apt-get update && apt-get install -y \
 ADD externals /app/externals
 WORKDIR /apps
 
+# numpy-1.20 requires python 3.7
+
+RUN python -m pip install \
+    environs \
+    numpy\<1.20
+
 RUN cd /app/externals/Scenic && python setup.py install
 RUN cd /app/externals/VerifAI && python setup.py install
 RUN cd /app/externals/PythonApi && python setup.py install
