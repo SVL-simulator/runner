@@ -131,7 +131,8 @@ class VSERunner:
                         'Prediction',
                         'Planning',
                         'Traffic Light',
-                        'Control'
+                        'Control',
+                        'Recorder'
                     ]
 
                     try:
