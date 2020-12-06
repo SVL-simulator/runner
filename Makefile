@@ -30,7 +30,7 @@ list-devenv-images:
 
 
 docker-latest-rel:
-	docker tag scenario_runner_devenv:latest lgsvl/simulator-scenarios-runner:latest
+	docker tag scenario-runner:latest lgsvl/simulator-scenarios-runner:latest
 	docker images | grep -E 'scenario_runner' | sort
 
 shell:
@@ -73,7 +73,8 @@ bundles-fast:
 	cd dist/lgsvlsimulator-scenarios-latest && ../../tests/check-bundle-content.sh
 
 bundles:
-	docker pull auto-gitlab.lgsvl.net:4567/hdrp/scenarios/runner:latest
+	docker tag scenario-runner:latest auto-gitlab.lgsvl.net:4567/hdrp/scenarios/runner:latest
+	# docker pull auto-gitlab.lgsvl.net:4567/hdrp/scenarios/runner:latest
 	./ci/make_bundle.sh latest auto-gitlab.lgsvl.net:4567/hdrp/scenarios/runner
 
 SIMULATOR_DIR?=/home/user/path/to/simulator
@@ -87,6 +88,10 @@ install-runtime-dist: .check_simulator_dir
 
 install-runtime-dev: .check_simulator_dir
 	./scripts/install-testcase-runtime.sh ${SIMULATOR_DIR}
+	tree ${SIMULATOR_DIR}/TestCaseRunner
+
+install-runtime-dist-copy: .check_simulator_dir
+	./dist/lgsvlsimulator-scenarios-latest/install-testcase-runtime.sh ${SIMULATOR_DIR} copy
 	tree ${SIMULATOR_DIR}/TestCaseRunner
 
 push-ci-trybyild:
