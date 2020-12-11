@@ -89,6 +89,12 @@ IMAGE_UUID=\$(uuidgen)
                                --build-arg BASE_IMAGE=${GITLAB_HOST}:4567/${GITLAB_REPO}\$DOCKER_REPO_SUFFIX:\$DOCKER_TAG .
 
           docker push ${GITLAB_HOST}:4567/${GITLAB_REPO}\$DOCKER_REPO_SUFFIX:\$DOCKER_TAG
+
+          if [ "${BRANCH_NAME}" = "${DEFAULT_BRANCH_NAME}" ]; then
+              docker tag  ${GITLAB_HOST}:4567/${GITLAB_REPO}\$DOCKER_REPO_SUFFIX:\$DOCKER_TAG \
+                          ${GITLAB_HOST}:4567/${GITLAB_REPO}\$DOCKER_REPO_SUFFIX:latest
+              docker push ${GITLAB_HOST}:4567/${GITLAB_REPO}\$DOCKER_REPO_SUFFIX:latest
+          fi
         """
       }
     }
