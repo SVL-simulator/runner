@@ -26,6 +26,11 @@ FROM python:3.6-slim
 COPY --from=builder /usr/local/lib/python3.6/site-packages /usr/local/lib/python3.6/site-packages
 COPY --from=builder /usr/local/bin/run* /usr/local/bin/
 
+COPY \
+    scripts/install-testcase-runtime.sh \
+    scripts/scenario_runner.sh \
+    /usr/share/scenarios-runner/scripts/
+
 RUN apt-get update \
     && apt-get install -y \
         libglib2.0-0 \
