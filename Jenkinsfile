@@ -72,7 +72,9 @@ pipeline {
 IMAGE_APP=scenarios/runner
 IMAGE_CREATED_BY=auto-jenkins
 IMAGE_CREATED_FROM=\$(git describe --always --tags)
+IMAGE_CREATED_FROM_SUBMODULES="\$(git submodule | xargs)"
 IMAGE_CREATED_ON=\$(date --iso-8601=seconds --utc)
+IMAGE_TAG=\$DOCKER_TAG
 # Increment IMAGE_INTERFACE_VERSION whenever changes to the image require that the launcher be updated.
 IMAGE_INTERFACE_VERSION=1
 IMAGE_UUID=\$(uuidgen)
