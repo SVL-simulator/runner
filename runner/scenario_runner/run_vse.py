@@ -33,9 +33,9 @@ class VSERunner:
         log.debug("simulator_host is {}, simulator_port is {}".format(simulator_host, simulator_port))
         self.sim = lgsvl.Simulator(simulator_host, simulator_port)
 
-    def connect_bridge(self, ego_agent, default_host="127.0.0.1", default_port=9090):
-        bridge_host = os.environ.get("LGSVL__AUTOPILOT_0_HOST", default_host)
-        bridge_port = int(os.environ.get("LGSVL__AUTOPILOT_0_PORT", default_port))
+    def connect_bridge(self, ego_agent, ego_index=0, default_host="127.0.0.1", default_port=9090):
+        bridge_host = os.environ.get("LGSVL__AUTOPILOT_{}_HOST".format(ego_index), default_host)
+        bridge_port = int(os.environ.get("LGSVL__AUTOPILOT_{}_PORT".format(ego_index), default_port))
         ego_agent.connect_bridge(bridge_host, bridge_port)
 
         return bridge_host, bridge_port
@@ -119,41 +119,39 @@ class VSERunner:
                 log.error("Original exception: " + str(e))
                 sys.exit(1)
 
-            # Only connecting the first agent to the bridge since we only have one environment variable
-            if i == 0:
-                try:
-                    bridge_host = self.connect_bridge(ego)[0]
-                    default_modules = [
-                        'Localization',
-                        'Perception',
-                        'Transform',
-                        'Routing',
-                        'Prediction',
-                        'Planning',
-                        'Traffic Light',
-                        'Control',
-                        'Recorder'
-                    ]
+            try:
+                bridge_host = self.connect_bridge(ego, i)[0]
+                default_modules = [
+                    'Localization',
+                    'Perception',
+                    'Transform',
+                    'Routing',
+                    'Prediction',
+                    'Planning',
+                    'Traffic Light',
+                    'Control',
+                    'Recorder'
+                ]
 
-                    try:
-                        modules = env.list("LGSVL__AUTOPILOT_0_VEHICLE_MODULES", subcast=str)
-                        if len(modules) == 0:
-                            modules = default_modules
-                    except Exception:
+                try:
+                    modules = os.environ.get("LGSVL__AUTOPILOT_{}_VEHICLE_MODULES".format(i)).split(",")
+                    if len(modules) == 0:
                         modules = default_modules
-                    dv = lgsvl.dreamview.Connection(self.sim, ego, bridge_host)
-                    dv.set_hd_map(os.environ.get("LGSVL_AUTOPILOT_HD_MAP", "Borregas Ave"))
-                    dv.set_vehicle(os.environ.get("LGSVL_AUTOPILOT_0_VEHICLE_CONFIG", 'Lincoln2017MKZ'))
-                    if "destinationPoint" in agent:
-                        dv.setup_apollo(agent_destination.x, agent_destination.z, modules)
-                    else:
-                        log.info("No destination set for EGO {}".format(agent_name))
-                        for mod in modules:
-                            dv.enable_module(mod)
-                except Exception as e:
-                    msg = "Somthing went wrong with bridge / dreamview connection."
-                    log.error("Original exception: " + str(e))
-                    log.error(msg)
+                except Exception:
+                    modules = default_modules
+                dv = lgsvl.dreamview.Connection(self.sim, ego, bridge_host)
+                dv.set_hd_map(os.environ.get("LGSVL_AUTOPILOT_HD_MAP", "Borregas Ave"))
+                dv.set_vehicle(os.environ.get("LGSVL_AUTOPILOT_{}_VEHICLE_CONFIG".format(i), 'Lincoln2017MKZ'))
+                if "destinationPoint" in agent:
+                    dv.setup_apollo(agent_destination.x, agent_destination.z, modules)
+                else:
+                    log.info("No destination set for EGO {}".format(agent_name))
+                    for mod in modules:
+                        dv.enable_module(mod)
+            except Exception as e:
+                msg = "Somthing went wrong with bridge / dreamview connection."
+                log.error("Original exception: " + str(e))
+                log.error(msg)
 
     def add_npc(self):
         for agent in self.npc_agents:
