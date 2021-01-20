@@ -34,8 +34,13 @@ class VSERunner:
         self.sim = lgsvl.Simulator(simulator_host, simulator_port)
 
     def connect_bridge(self, ego_agent, ego_index=0, default_host="127.0.0.1", default_port=9090):
-        bridge_host = os.environ.get("LGSVL__AUTOPILOT_{}_HOST".format(ego_index), default_host)
-        bridge_port = int(os.environ.get("LGSVL__AUTOPILOT_{}_PORT".format(ego_index), default_port))
+        autopilot_host_env = "LGSVL__AUTOPILOT_{}_HOST".format(ego_index)
+        autopilot_port_env = "LGSVL__AUTOPILOT_{}_PORT".format(ego_index)
+        if  autopilot_host_env not in os.environ:
+            raise RuntimeWarning("Environment variable {} is absent or empty.".format(autopilot_host_env))
+
+        bridge_host = os.environ.get(autopilot_host_env, default_host)
+        bridge_port = int(os.environ.get(autopilot_port_env, default_port))
         ego_agent.connect_bridge(bridge_host, bridge_port)
 
         return bridge_host, bridge_port
@@ -105,6 +110,9 @@ class VSERunner:
                     agent["destinationPoint"]["position"]["y"],
                     agent["destinationPoint"]["position"]["z"]
                 )
+                #
+                # Set distination rotation once it is supported by DreamView
+                #
                 agent_destination_rotation = lgsvl.Vector(
                     agent["destinationPoint"]["rotation"]["x"],
                     agent["destinationPoint"]["rotation"]["y"],
@@ -148,8 +156,12 @@ class VSERunner:
                     log.info("No destination set for EGO {}".format(agent_name))
                     for mod in modules:
                         dv.enable_module(mod)
+            except RuntimeWarning as e:
+                msg = "Skipping bridge connection for vechile: {}".format(agent["id"])
+                log.warning("Original exception: " + str(e))
+                log.warning(msg)
             except Exception as e:
-                msg = "Somthing went wrong with bridge / dreamview connection."
+                msg = "Something went wrong with bridge / dreamview connection."
                 log.error("Original exception: " + str(e))
                 log.error(msg)
 
