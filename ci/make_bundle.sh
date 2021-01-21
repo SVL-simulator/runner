@@ -37,7 +37,6 @@ function copy_scripts {
 
 function copy_scenarios {
     mkdir -p $DIST_PATH/scenarios
-    cp -r scenarios/Scenic $DIST_PATH/scenarios
     cp -r scenarios/Python $DIST_PATH/scenarios
     cp -r scenarios/VSE $DIST_PATH/scenarios
 }
@@ -46,9 +45,6 @@ function copy_docs {
     copy_docs_${BUNDLE_FLAVOR}
 }
 
-function copy_docs_scenic {
-    cp -r docs/Scenic $DIST_PATH/docs
-}
 
 function copy_docs_python-api {
     cp -r docs/Python $DIST_PATH/docs

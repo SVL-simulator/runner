@@ -1,86 +1,48 @@
-# Scenic scenarios runner for LGSVL Simulator
+# Scenario runner for LGSVL Simulator
+
+The scenario runner provides an environment for running PythonApi and Visual Scenario Editor (VSE) scripts with the LGSVL simulator.
+
+## Requirements
+- Linux operating system
+- Docker
+- LGSVL simulator
+
+## Installation with LGSVL simulator binary
+
+The release bundle for the scenario runner can be installed in the simulator binary directory.
+To install follow these steps:
+
+1. Download and extract the simulator release binary (2021.1 release or later)
+2. Download and extract the scenario runner bundle
+3. Open a terminal and navigate to the `scripts` directory in the extracted directory for the scenario runner:
+    ```
+    cd PATH_TO_SCENARIO_RUNNER/
+    ```
+4. Run the install script:
+    ```
+    ./install_scenario_runner.sh path_to_lgsvl_simulator_binary copy
+    ```
+
+Once the installation is complete the scenario runner will be used through the LGSVL simulator web interface directly when the PythonApi or VSE templates are selected during simulation creation.
 
 
-## Quick start
+## Building and running in developer mode
+To run in developer mode follow these steps:
+1. Clone the repository
+2. Run `make build` to build the development docker image
+3. Run `make devenv` to start the docker image
+4. Start the LGSVL simulator, create and start an **API Only** simulation.
+5. Run a scenario using the `run` command:
+    ```
+    run PATH_TO_SCENARIO
+    ```
 
-Download runner [script](scripts/scenic_lgsvl.sh) by this [link](scripts/scenic_lgsvl.sh?inline=false) and save it as `~/.local/bin/scenic_lgsvl.sh`
 
-Alternatively, you can extract to from docker image:
+## Building bundle locally
 
-```
-mkdir -p ~/.local/bin
-docker run --rm auto-gitlab.lgsvl.net:4567/hdrp/scenarios/runner:latest get_scenic_lgsvl > ~/.local/bin/scenic_lgsvl.sh
-```
-
-Make sure script is executable
-
-```
-chmod +x ~/.local/bin/scenic_lgsvl.sh
-```
-Check if scenic_lgsvl.sh is working with command `scenic_lgsvl.sh help`. You should get the usage information like this:
-
-```
-Usage: scenic_lgsvl.sh help|pull|env|bash|COMMAND [ARGS...]
-
-    help - Show this message
-    pull - pull docker image
-    env  - print usefull environment variables
-    bash - Run container with interactive shell
-    COMMAND - run command inside the container.
-```
-
-Clone scenarios repo
-
-```
-git clone git@auto-gitlab.lgsvl.net:HDRP/Scenarios/scenarios.git
-```
-
-To run a specific scenario go to scenario folder:
-
-```
-cd scenarios/scenario_2_1
-```
-
-then run python script with scenic_lgsvl.sh
-
-```
-scenic_lgsvl.sh python scenario_2_1_simulator_Apollo.py
-```
-
-## Get development environment from source
-
-* To get a fresh clone:
-
-```
-    $ git clone --recursive git@auto-gitlab.lgsvl.net:HDRP/Scenarios/runner.git
-    $ cd runner
-    $ make build
-    $ make devenv
-```
-
-* To upadate existing workcopy:
-
-```
-    $ cd runner
-    $ git submodule init &&	git submodule update
-    $ make build
-    $ make devenv
-```
-
-## Link development environment as simulator scenario runtime
-
-Using `install-testcase-runtime.sh` script:
-
-```shell
-$ ./scripts/install-testcase-runtime.sh /path/to/simulator
-```
-
-By invoking make target:
-
-```shell
-$ make install-runtime-dev SIMULATOR_DIR=/path/to/simulator
-```
-
-## Known issues/limitations
-
-* You have to go inside the specific scenario folder.
+1. Build a dev image as described in the previous section
+2. From the repository root run:
+    ```
+    ./ci/make_bundle.sh dev
+    ```
+3. The bundle will be located in the `dist` directory of the repository and can be installed following the steps described in **Installation with LGSVL simulator binary**.

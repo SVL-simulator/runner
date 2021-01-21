@@ -18,8 +18,6 @@ RUN python -m pip install \
     scipy\<1.6.0 \
     pandas\<1.2.0
 
-RUN cd /app/externals/Scenic && python setup.py install
-RUN cd /app/externals/VerifAI && python setup.py install
 RUN cd /app/externals/PythonApi && python setup.py install
 
 ADD runner /app/runner

@@ -169,7 +169,7 @@ function test_case_runtime()  {
     echo "Starting TestCase runtime"
     unset DOCKER_RUN_TTY
 
-    SIMULATOR_TC_FILENAME=$(echo ${SIMULATOR_TC_FILENAME} | sed -E 's#^(Python|Scenic)/##')
+    SIMULATOR_TC_FILENAME=$(echo ${SIMULATOR_TC_FILENAME} | sed -E 's#^(Python)/##')
 
     run_container run ${SIMULATOR_TC_FILENAME}
 }

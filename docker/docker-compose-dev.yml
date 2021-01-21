@@ -48,4 +48,4 @@ services:
             - LGSVL__TIME_OF_DAY
             - LGSVL__TIME_STATIC
             - LGSVL__VEHICLE_0
-            - "PYTHONPATH=/src/runner:/src/externals/Scenic/src:/src/externals/PythonApi:/src/externals/VerifAI"
+            - "PYTHONPATH=/src/runner:/src/externals/PythonApi"

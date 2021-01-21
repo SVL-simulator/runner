@@ -12,7 +12,7 @@ function usage {
     exit 1
 }
 
-SUPPORTED_RUNTIMES='pythonAPI pythonApi scenic vse visualEditor'
+SUPPORTED_RUNTIMES='pythonAPI pythonApi vse visualEditor'
 WRAPPER_SCRIPT=scenario_runner.sh
 
 if [ ! -x ${SIMULATOR_DIR}/simulator ]; then
