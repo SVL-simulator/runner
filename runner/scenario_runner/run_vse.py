@@ -89,6 +89,9 @@ class VSERunner:
 
         controllables_data = self.VSE_dict["controllables"]
         for controllable_data in controllables_data:
+            if 'name' not in controllable_data:
+                continue
+
             log.debug("Adding controllable {}".format(controllable_data["name"]))
             controllable_state = lgsvl.ObjectState()
             controllable_state.transform = self.read_transform(controllable_data["transform"])
