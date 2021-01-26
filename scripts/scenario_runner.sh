@@ -4,38 +4,6 @@ set -eu
 # set -x
 
 SCENARIO_RUNNER_IMAGE_DEFAULT=auto-gitlab.lgsvl.net:4567/hdrp/scenarios/runner:dev
-
-# Envvar defaults
-env_vars=(
-LGSVL__AUTOPILOT_0_HOST
-LGSVL__AUTOPILOT_0_PORT
-LGSVL__AUTOPILOT_0_VEHICLE_CONFIG
-LGSVL__AUTOPILOT_0_VEHICLE_MODULES
-LGSVL__AUTOPILOT_HD_MAP
-LGSVL__DATE_TIME
-LGSVL__DREAMVIEW__CONTROL_MESSAGE_TIMEOUT_SECS
-LGSVL__ENVIRONMENT_CLOUDINESS
-LGSVL__ENVIRONMENT_DAMAGE
-LGSVL__ENVIRONMENT_FOG
-LGSVL__ENVIRONMENT_RAIN
-LGSVL__ENVIRONMENT_WETNESS
-LGSVL__MAP
-LGSVL__RANDOM_SEED
-LGSVL__SIMULATION_DURATION_SECS
-LGSVL__SIMULATOR_HOST
-LGSVL__SIMULATOR_PORT
-LGSVL__TIME_OF_DAY
-LGSVL__TIME_STATIC
-LGSVL__SPAWN_BICYCLES
-LGSVL__SPAWN_PEDESTRIANS
-LGSVL__SPAWN_TRAFFIC
-LGSVL__VEHICLE_0
-# Old variables to backward compatibility
-SIMULATOR_HOST
-SIMULATOR_PORT
-BRIDGE_HOST
-BRIDGE_PORT
-) # Default values for these variables should be provided by the python script
 SCENARIOS_DIR=${SCENARIOS_DIR:-$(pwd)}
 SCENARIO_RUNNER_IMAGE=${SCENARIO_RUNNER_IMAGE:-${SCENARIO_RUNNER_IMAGE_DEFAULT}}
 
@@ -74,8 +42,8 @@ function prepare_docker_run_args() {
 
 DOCKER_RUN_ENV_VARS=
 
-# Go through each environment variable in the env_vars array
-# If it has been set, then add it to the list of parameters for the `docker run` command
+# Go through each environment variable with LGSVL__ prefix present,
+# then add it to the list of parameters for the `docker run` command
 function prepare_docker_run_env_vars() {
     # HACK Temp solution to use old variable
     if [ -z "${LGSVL__MAP:-}" -a -n "${SIMULATOR_MAP:-}" ]; then
@@ -83,11 +51,11 @@ function prepare_docker_run_env_vars() {
         export LGSVL__MAP
     fi
 
+    echo "Simulation environment:"
     local var
-    for var in ${env_vars[@]}; do
-        if [ -n "${!var-}" ]; then
-            DOCKER_RUN_ENV_VARS="${DOCKER_RUN_ENV_VARS} -e $var"
-        fi
+    for var in "${!LGSVL__@}"; do
+        printf '%s=%s\n' "$var" "${!var}"
+        DOCKER_RUN_ENV_VARS="${DOCKER_RUN_ENV_VARS} -e $var"
     done
 }
 
@@ -114,9 +82,6 @@ function run_container() {
 
     echo "Scenario runner image: ${SCENARIO_RUNNER_IMAGE}"
 
-    echo "Simulation environment:"
-    printenv | sort | grep -E '^(SIMULATOR|BRIDGE|LGSVL__)' || true
-
     docker run \
         --rm ${DOCKER_RUN_TTY:-} --interactive \
         --user=${DOCKER_USER} \
@@ -128,13 +93,11 @@ function run_container() {
 }
 
 function cmd_env() {
-    # Go through each environment variable in env_vars
-    # Print out those that have been set
+    # Go through each LGSVL environment variable and print them
     local var
-    for var in ${env_vars[@]}; do
-        if [ -n "${!var-}" ]; then
-            echo "${var}=${!var}"
-        fi
+    for var in "${!LGSVL__@}"; do
+        printf '%s=%s\n' "$var" "${!var}"
+        DOCKER_RUN_ENV_VARS="${DOCKER_RUN_ENV_VARS} -e $var"
     done
     echo "SCENARIOS_DIR=${SCENARIOS_DIR}"
     echo "SCENARIO_RUNNER_IMAGE=${SCENARIO_RUNNER_IMAGE}"
