@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# Copyright (c) 2020 LG Electronics, Inc.
+# Copyright (c) 2020-2021 LG Electronics, Inc.
 #
 # This software contains code licensed as described in LICENSE.
 #
@@ -88,19 +88,30 @@ class VSERunner:
             return
 
         controllables_data = self.VSE_dict["controllables"]
-        for controllable_data in controllables_data:
-            if 'name' not in controllable_data:
-                continue
-
-            log.debug("Adding controllable {}".format(controllable_data["name"]))
-            controllable_state = lgsvl.ObjectState()
-            controllable_state.transform = self.read_transform(controllable_data["transform"])
-            try:
-                self.sim.controllable_add(controllable_data["name"], controllable_state)
-            except Exception as e:
-                msg = "Failed to add controllable {}, please make sure you have the correct simulator".format(controllable_data["name"])
-                log.error(msg)
-                log.error("Original exception: " + str(e))
+        for controllable_data in controllables_data:	
+            #Name checking for backwards compability
+            spawned = "name" in controllable_data or ("spawned" in controllables_data and controllable_data["spawned"])
+            if spawned:
+                log.debug("Adding controllable {}".format(controllable_data["name"]))
+                controllable_state = lgsvl.ObjectState()
+                controllable_state.transform = self.read_transform(controllable_data["transform"])
+                try:
+                    controllable = self.sim.controllable_add(controllable_data["name"], controllable_state)
+                    policy = controllable_data["policy"]
+                    if len(policy) > 0:
+                        controllable.control(policy)
+                except Exception as e:
+                    msg = "Failed to add controllable {}, please make sure you have the correct simulator".format(controllable_data["name"])
+                    log.error(msg)
+                    log.error("Original exception: " + str(e))
+            else:
+                uid = controllable_data["uid"]
+                log.debug("Setting policy for controllable {}".format(uid))
+                controllable = self.sim.get_controllable_by_uid(uid)
+                policy = controllable_data["policy"]
+                if len(policy) > 0:
+                    controllable.control(policy)
+                
 
     def add_ego(self):
         for i, agent in enumerate(self.ego_agents):
@@ -160,7 +171,7 @@ class VSERunner:
                     for mod in modules:
                         dv.enable_module(mod)
             except RuntimeWarning as e:
-                msg = "Skipping bridge connection for vechile: {}".format(agent["id"])
+                msg = "Skipping bridge connection for vehicle: {}".format(agent["id"])
                 log.warning("Original exception: " + str(e))
                 log.warning(msg)
             except Exception as e:
