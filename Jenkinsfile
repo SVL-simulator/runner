@@ -76,7 +76,7 @@ IMAGE_CREATED_FROM_SUBMODULES="\$(git submodule | xargs)"
 IMAGE_CREATED_ON=\$(date --iso-8601=seconds --utc)
 IMAGE_TAG=\$DOCKER_TAG
 # Increment IMAGE_INTERFACE_VERSION whenever changes to the image require that the launcher be updated.
-IMAGE_INTERFACE_VERSION=1
+IMAGE_INTERFACE_VERSION=2
 IMAGE_UUID=\$(uuidgen)
 !
           docker cp image-info.source \$TEMP_CONT:/etc/wise-image-info.source

@@ -36,10 +36,12 @@ COPY \
 RUN set -ex \
     && apt-get update -qq \
     && DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -q -y \
+        jq \
         libglib2.0-0 \
         libsm6 \
         libxrender1 \
         libxext6 \
         libgl1 \
+        netcat-openbsd \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
