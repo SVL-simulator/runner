@@ -65,7 +65,7 @@ pipeline {
           fi
 
           docker login -u ${DOCKER_USR} -p ${DOCKER_PSW} ${GITLAB_HOST}:4567
-          docker build -f docker/Dockerfile -t scenarios-runner-tmp .
+          docker build -f docker/Dockerfile -t scenarios-runner-tmp --pull --no-cache .
           TEMP_CONT=`docker create scenarios-runner-tmp --name scenarios-runner-tmp`
 
           cat <<! > image-info.source
