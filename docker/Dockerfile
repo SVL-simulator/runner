@@ -1,4 +1,5 @@
-FROM python:3.6-slim as builder
+# As of 2021-02-16, 3.6-slim == 3.6.13-slim-buster
+FROM python:3.6.13-slim-buster AS builder
 
 RUN apt-get update && apt-get install -y \
     gcc
@@ -21,7 +22,7 @@ RUN cd /app/externals/PythonApi && python setup.py install
 ADD runner /app/runner
 RUN cd /app/runner && python setup.py install
 
-FROM python:3.6-slim
+FROM python:3.6.13-slim-buster
 
 COPY --from=builder /usr/local/lib/python3.6/site-packages /usr/local/lib/python3.6/site-packages
 COPY --from=builder /usr/local/bin/run* /usr/local/bin/
