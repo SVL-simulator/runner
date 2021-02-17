@@ -3,7 +3,6 @@
 FROM python:3.6.13-buster AS builder
 
 ADD externals /app/externals
-WORKDIR /apps
 
 # numpy-1.20 requires python 3.7
 
