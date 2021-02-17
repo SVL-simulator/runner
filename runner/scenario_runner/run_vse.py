@@ -134,7 +134,10 @@ class VSERunner:
                 )
 
             try:
-                ego = self.sim.add_agent(agent_name, lgsvl.AgentType.EGO, agent_state)
+                if "sensorsConfigurationId" in agent:
+                    ego = self.sim.add_agent(agent["sensorsConfigurationId"], lgsvl.AgentType.EGO, agent_state)
+                else:
+                    ego = self.sim.add_agent(agent_name, lgsvl.AgentType.EGO, agent_state)
             except Exception as e:
                 msg = "Failed to add agent {}, please make sure you have the correct simulator".format(agent_name)
                 log.error(msg)
