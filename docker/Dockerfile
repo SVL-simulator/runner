@@ -1,8 +1,11 @@
 # As of 2021-02-16, 3.6-slim == 3.6.13-slim-buster
 FROM python:3.6.13-slim-buster AS builder
 
-RUN apt-get update && apt-get install -y \
-    gcc
+RUN set -ex \
+    && apt-get update -qq \
+    && DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -q -y \
+        gcc \
+        libc-dev
 
 ADD externals /app/externals
 WORKDIR /apps
@@ -32,8 +35,9 @@ COPY \
     scripts/scenario_runner.sh \
     /usr/share/scenarios-runner/scripts/
 
-RUN apt-get update \
-    && apt-get install -y \
+RUN set -ex \
+    && apt-get update -qq \
+    && DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -q -y \
         libglib2.0-0 \
         libsm6 \
         libxrender1 \
