@@ -7,9 +7,13 @@ FROM python:3.6.13-buster AS builder
 ADD .git /app/.git
 
 ADD externals /app/externals
-RUN set -ex \
-    && cd /app/externals/PythonApi \
-    && python3 -m pip install . -r requirements.txt
+COPY requirements.txt /app/
+ARG GENERATE_REQUIREMENTS_TXT=false
+RUN set -ex; \
+    requirements=/app/requirements.txt; \
+    if ${GENERATE_REQUIREMENTS_TXT} || ! [ -s $requirements ]; then requirements=/app/externals/PythonApi/requirements.txt; fi; \
+    cd /app/externals/PythonApi; \
+    python3 -m pip install -r $requirements .
 
 ARG PYTHON_INSTALL_ENV
 ADD runner /app/runner
