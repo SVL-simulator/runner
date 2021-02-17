@@ -37,6 +37,14 @@ To run in developer mode follow these steps:
     run PATH_TO_SCENARIO
     ```
 
+## Upgrade dependencies
+
+The versions of the dependencies are pinned by the `requirements.txt` file. Whenever dependencies are changed, update it by
+running:
+
+```
+    $ make upgrade-base-dependencies
+```
 
 ## Building bundle locally
 

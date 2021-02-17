@@ -19,6 +19,16 @@ endif
 build-base:
 	docker build $(DOCKER_BUILD_OPTS) -f docker/Dockerfile -t local/scenario_runner_base .
 
+upgrade-base-dependencies:
+	docker build --pull --no-cache -f docker/Dockerfile \
+		--target builder \
+		-t local/scenario_runner_base_requirements \
+		--build-arg GENERATE_REQUIREMENTS_TXT=true \
+		.
+	# Don't include the packages that we build.
+	docker run --rm local/scenario_runner_base_requirements python3 -m pip freeze | grep -v '@ file://' > requirements.txt
+	docker image rm local/scenario_runner_base_requirements
+
 build-devenv: build-base
 	docker build $(DOCKER_BUILD_OPTS) -f docker/Dockerfile.devenv --build-arg BASE_IMAGE=local/scenario_runner_base -t local/scenario_runner_devenv .
 
