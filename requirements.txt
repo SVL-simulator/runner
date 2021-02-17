@@ -1,0 +1,7 @@
+environs==9.3.2
+marshmallow==3.12.1
+numpy==1.19.5
+python-dotenv==0.17.1
+six==1.16.0
+websocket-client==0.59.0
+websockets==8.0.2
