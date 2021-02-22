@@ -165,8 +165,8 @@ class VSERunner:
                 except Exception:
                     modules = default_modules
                 dv = lgsvl.dreamview.Connection(self.sim, ego, bridge_host)
-                dv.set_hd_map(os.environ.get("LGSVL_AUTOPILOT_HD_MAP", self.sim.current_scene))
-                dv.set_vehicle(os.environ.get("LGSVL_AUTOPILOT_{}_VEHICLE_CONFIG".format(i), agent_name))
+                dv.set_hd_map(os.environ.get("LGSVL__AUTOPILOT_HD_MAP", self.sim.current_scene))
+                dv.set_vehicle(os.environ.get("LGSVL__AUTOPILOT_{}_VEHICLE_CONFIG".format(i), agent_name))
                 if "destinationPoint" in agent:
                     dv.setup_apollo(agent_destination.x, agent_destination.z, modules)
                 else:
