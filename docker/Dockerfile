@@ -1,11 +1,6 @@
-# As of 2021-02-16, 3.6-slim == 3.6.13-slim-buster
-FROM python:3.6.13-slim-buster AS builder
-
-RUN set -ex \
-    && apt-get update -qq \
-    && DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -q -y \
-        gcc \
-        libc-dev
+# As of 2021-02-16, 3.6[-slim] == 3.6.13[-slim]-buster
+# Use the non-slim image because it already has gcc and libc-dev pre-installed.
+FROM python:3.6.13-buster AS builder
 
 ADD externals /app/externals
 WORKDIR /apps
