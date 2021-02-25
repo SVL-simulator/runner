@@ -2,16 +2,14 @@
 # Use the non-slim image because it already has gcc and libc-dev pre-installed.
 FROM python:3.6.13-buster AS builder
 
-ADD externals /app/externals
-
 # numpy-1.20 requires python 3.7
-
 RUN python -m pip install \
     environs \
     numpy\<1.20 \
     scipy\<1.6.0 \
     pandas\<1.2.0
 
+ADD externals /app/externals
 RUN cd /app/externals/PythonApi && python setup.py install
 
 ADD runner /app/runner
