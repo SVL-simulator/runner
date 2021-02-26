@@ -1,9 +1,9 @@
 # As of 2021-02-16, 3.6[-slim] == 3.6.13[-slim]-buster
-# Use the non-slim image because it already has gcc and libc-dev pre-installed.
+# Use the non-slim image because it already has gcc, git, and libc-dev pre-installed.
 FROM python:3.6.13-buster AS builder
 
 # numpy-1.20 requires python 3.7
-RUN python -m pip install \
+RUN python3 -m pip install \
     environs \
     numpy\<1.20 \
     scipy\<1.6.0 \
@@ -14,10 +14,14 @@ ADD externals /app/externals
 ADD .git/modules/externals/PythonApi /app/.git/modules/externals/PythonApi
 RUN set -ex \
     && cd /app/externals/PythonApi \
-    && python -m pip install .
+    && python3 -m pip install .
 
 ADD runner /app/runner
-RUN cd /app/runner && python setup.py install
+# The "git describe" done by get_version() in runner/setup.py needs this directory:
+ADD .git /app/.git
+RUN set -ex \
+    && cd /app/runner \
+    && python3 -m pip install .
 
 FROM python:3.6.13-slim-buster
 
