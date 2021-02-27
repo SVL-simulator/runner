@@ -10,7 +10,11 @@ RUN python -m pip install \
     pandas\<1.2.0
 
 ADD externals /app/externals
-RUN cd /app/externals/PythonApi && python setup.py install
+# The "git describe" done by get_version() in externals/PythonApi/setup.py needs this directory:
+ADD .git/modules/externals/PythonApi /app/.git/modules/externals/PythonApi
+RUN set -ex \
+    && cd /app/externals/PythonApi \
+    && python -m pip install .
 
 ADD runner /app/runner
 RUN cd /app/runner && python setup.py install
