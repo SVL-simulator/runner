@@ -18,10 +18,11 @@ RUN set -ex \
     && cd /app/externals/PythonApi \
     && python3 -m pip install .
 
+ARG PYTHON_INSTALL_ENV
 ADD runner /app/runner
 RUN set -ex \
     && cd /app/runner \
-    && python3 -m pip install .
+    && eval ${PYTHON_INSTALL_ENV} python3 -m pip install .
 
 FROM python:3.6.13-slim-buster
 
