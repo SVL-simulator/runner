@@ -46,3 +46,11 @@ To run in developer mode follow these steps:
     ./ci/make_bundle.sh dev
     ```
 3. The bundle will be located in the `dist` directory of the repository and can be installed following the steps described in **Installation with SVL simulator binary**.
+
+# Tagging releases
+
+The final change for a new release must be to set the argument of the
+`get_version('<VERSION>')` call in `runner/setup.py` to the new version.
+Then commit this change and tag it with the new version:
+
+    git tag -a -m <VERSION> <VERSION>
