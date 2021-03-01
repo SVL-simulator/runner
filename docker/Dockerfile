@@ -9,16 +9,16 @@ RUN python3 -m pip install \
     scipy\<1.6.0 \
     pandas\<1.2.0
 
+# The "git describe" done by get_version() in runner/setup.py needs .git (and the "git describe" done by get_version() in
+# externals/PythonApi/setup.py needs its subdirectory .git/modules/externals/PythonApi):
+ADD .git /app/.git
+
 ADD externals /app/externals
-# The "git describe" done by get_version() in externals/PythonApi/setup.py needs this directory:
-ADD .git/modules/externals/PythonApi /app/.git/modules/externals/PythonApi
 RUN set -ex \
     && cd /app/externals/PythonApi \
     && python3 -m pip install .
 
 ADD runner /app/runner
-# The "git describe" done by get_version() in runner/setup.py needs this directory:
-ADD .git /app/.git
 RUN set -ex \
     && cd /app/runner \
     && python3 -m pip install .
