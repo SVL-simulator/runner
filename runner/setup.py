@@ -4,9 +4,9 @@ from setuptools import setup
 
 setup(
     name="scenario_runner",
-    description="Scenario Runner for LGSVL Simulator",
+    description="Scenario Runner for SVL Simulator",
     author="LGSVL",
-    author_email="contact@lgsvlsimulator.com",
+    author_email="contact@svlsimulator.com",
     python_requires=">=3.6.0",
     packages=["scenario_runner"],
     entry_points={

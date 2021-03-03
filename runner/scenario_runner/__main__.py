@@ -27,7 +27,7 @@ def setup_log_levels(log_level):
 
 
 def parse_args():
-    description = 'Run Python and VSE-generated scenarios on LGSVL Simulator'
+    description = 'Run Python and VSE-generated scenarios on SVL Simulator'
     scenario_file_description = 'Python (*.py) or VSE JSON (*.json) scenario file'
 
     parser = argparse.ArgumentParser(os.path.basename(sys.argv[0]),

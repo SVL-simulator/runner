@@ -93,7 +93,7 @@ function run_container() {
 }
 
 function cmd_env() {
-    # Go through each LGSVL environment variable and print them
+    # Go through each LGSVL__ environment variable and print them
     local var
     for var in "${!LGSVL__@}"; do
         printf '%s=%s\n' "$var" "${!var}"
@@ -125,7 +125,7 @@ Important note: command is launched in a singleshot container so scenarios shall
 
 ENVIRONMENT VARIABLES:
 
-    * LGSVL__AUTOPILOT_0_HOST - Autopilot bridge hostname or IP. If LGSVL Simultor is running on a different host than Autopilot, this must be set.
+    * LGSVL__AUTOPILOT_0_HOST - Autopilot bridge hostname or IP. If SVL Simulator is running on a different host than Autopilot, this must be set.
     * LGSVL__AUTOPILOT_0_PORT - Autopilot bridge port
     * LGSVL__AUTOPILOT_0_VEHICLE_CONFIG - Vehicle configuration to be loaded in Dreamview (Capitalization and spacing must match the dropdown in Dreamview)
     * LGSVL__AUTOPILOT_0_VEHICLE_MODULES - Comma-separated list of modules to be enabled in Dreamview. Items must be enclosed by double-quotes and there must not be spaces between the double-quotes and commas. (Capitalization and space must match the sliders in Dreamview)
@@ -139,8 +139,8 @@ ENVIRONMENT VARIABLES:
     * LGSVL__MAP - Name of map to be loaded in Simulator
     * LGSVL__RANDOM_SEED - Seed used to determine random factors (e.g. NPC type, color, behaviour)
     * LGSVL__SIMULATION_DURATION_SECS - The time length of the simulation [int]
-    * LGSVL__SIMULATOR_HOST - LGSVL Simulator hostname or IP
-    * LGSVL__SIMULATOR_PORT - LGSVL Simulator port
+    * LGSVL__SIMULATOR_HOST - SVL Simulator hostname or IP
+    * LGSVL__SIMULATOR_PORT - SVL Simulator port
     * LGSVL__SPAWN_BICYCLES - Whether or not to spawn bicycles
     * LGSVL__SPAWN_PEDESTRIANS - Whether or not to spawn pedestrians
     * LGSVL__SPAWN_TRAFFIC - Whether or not to spawn NPC vehicles

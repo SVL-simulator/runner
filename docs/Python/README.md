@@ -3,9 +3,9 @@ Python Runner
 
 Introduction
 ------------
-Python Runner is a tool for the LGSVL Simulator which executes test cases written in Python using the [LGSVL Python API](https://www.lgsvlsimulator.com/docs/python-api/). 
+Python Runner is a tool for the SVL Simulator which executes test cases written in Python using the [Python API for SVL Simulator](https://www.svlsimulator.com/docs/python-api/).
 
-Python scripts can be used to implement many different kinds of tests to run in the LGSVL Simulator.
+Python scripts can be used to implement many different kinds of tests to run in the SVL Simulator.
 
 Among the general use-cases of Python Runner are:
 
@@ -13,13 +13,13 @@ Among the general use-cases of Python Runner are:
 - Performing automated (e.g. acceptance) tests based on a set of repeatable test cases
 - Performing automated regressions tests
 
-This first preview release of the Python Runner provides the ability to perform several sample test cases in the LGSVL Simulator using Apollo for Autonomous Driving. This document describes how to run these tests with Apollo.
+This first preview release of the Python Runner provides the ability to perform several sample test cases in the SVL Simulator using Apollo for Autonomous Driving. This document describes how to run these tests with Apollo.
 
 For example, one provided example is a "cut-in" test case which is performed on the San Francisco map (shown below).
 
-Another provided example is a "sudden braking" test case which is performed on the SingleLaneRoad map (shown below). 
+Another provided example is a "sudden braking" test case which is performed on the SingleLaneRoad map (shown below).
 
-Additional examples demonstrate pedestrian-crossing test case which can be performed on the Straight1LanePedestrianCrosswalk map and the red-light runner test case which is performed on the Borregas Ave map. 
+Additional examples demonstrate pedestrian-crossing test case which can be performed on the Straight1LanePedestrianCrosswalk map and the red-light runner test case which is performed on the Borregas Ave map.
 
 ![](./images/cut-in-sim.png)
 
@@ -72,16 +72,16 @@ Requirements
 ------------
 Python Runner has these dependencies:
 
-1. LGSVL Simulator -- the release tag of the simulator should match the release tag of Python Runner to ensure compatibility.
+1. SVL Simulator -- the release tag of the simulator should match the release tag of Python Runner to ensure compatibility.
 2. Apollo 5.0 lgsvl fork
 3. Docker
 4. Docker compose
 
-### Downloading and launching the LGSVL Simulator
+### Downloading and launching the SVL Simulator
 
 The Simulator release can be downloaded as a prebuilt binary from the premium release download page. Make sure to download the simulator binary from the same release as the resimulation release under use.
 
-Download and extract the zip archive at the desired location. In the unzipped directory, run the executable file named simulator to launch the LGSVL Simulator.
+Download and extract the zip archive at the desired location. In the unzipped directory, run the executable file named simulator to launch the SVL Simulator.
 
 The main window of the simulator will open up as seen below. Click on the Open Browser button to launch the simulator Web UI in a web browser. The Web UI controls all aspects of the simulator.
 
@@ -89,7 +89,7 @@ The main window of the simulator will open up as seen below. Click on the Open B
 
 You will need to create an account to login to the Web UI. Once logged in you will be able to configure vehicles sensor arrangements, select maps, and create simulations to run in the simulator.
 
-### Start LGSVL Simulator in API Only mode
+### Start SVL Simulator in API Only mode
 
 - From the simulator Web UI click on the provided (default) API-only Test Case (formerly simulation), or create a new API-only Test Case if needed.
 
@@ -98,7 +98,7 @@ You will need to create an account to login to the Web UI. Once logged in you wi
 #### Creating the API-only Test Case (only if needed)
 1. In the `Test Cases` tab in the Web UI click on `Add new` in the upper right corner.
 2. In the `General` tab, enter a name for the Test Case (e.g. "API Only") and check the `API Only` box.
-3. Click on `Mode` menu and select `API Only`. 
+3. Click on `Mode` menu and select `API Only`.
 3. Click the `Submit` button to finish adding the test case.
 
     ![](./images/create-api-simulation.png)
@@ -107,19 +107,19 @@ You will need to create an account to login to the Web UI. Once logged in you wi
 1. In the `Test Cases` tab in the Web UI click on the `API Only` test case.
 2. At the bottom of the Web UI, click on the red "Run" (triangle/play) button to start the API-only simulation.
 
-See simulator documentation on the [Web UI Simulations tab](https://www.lgsvlsimulator.com/docs/simulations-tab/) for more information on setting up simulations.
+See simulator documentation on the [Web UI Simulations tab](https://www.svlsimulator.com/docs/simulations-tab/) for more information on setting up simulations.
 
 Launching Apollo alongside the Simulator
 -------------------------
 ### Installing (and Building) Apollo 5.0
-Please follow the instructions on the LGSVL Simulator documentation website to for [Running Apollo 5.0 with LGSVL Simulator](https://www.lgsvlsimulator.com/docs/apollo5-0-instructions/) if you have not already done so. This will involve installing Docker CE, Nvidia Docker and the LGSVL Docker image, then cloning the lgsvl fork of the Apollo 5.0 sources, and finally building Apollo and the bridge.
+Please follow the instructions on the SVL Simulator documentation website to for [Running Apollo 5.0 with SVL Simulator](https://www.svlsimulator.com/docs/apollo5-0-instructions/) if you have not already done so. This will involve installing Docker CE, Nvidia Docker and the SVL Docker image, then cloning the lgsvl fork of the Apollo 5.0 sources, and finally building Apollo and the bridge.
 
 
 ### Start Apollo 5.0
 - Open a terminal, change directory to the apollo-5.0 project (lgsvl fork: https://github.com/lgsvl/apollo-5.0), and type:
 	- `./docker/dev_start.sh` to start apollo container
 	- `./docker/dev_into.sh` to enter the container
-	- Make sure you have built Apollo with GPU enabled options; for more details, refer to [Running Apollo 5.0 with LGSVL Simulator](https://www.lgsvlsimulator.com/docs/apollo5-0-instructions/).
+	- Make sure you have built Apollo with GPU enabled options; for more details, refer to [Running Apollo 5.0 with SVL Simulator](https://www.svlsimulator.com/docs/apollo5-0-instructions/).
 	- `bootstrap.sh && bridge.sh &` to start the Apollo Dreamview Web UI and cyber_bridge.
 - Open browser, enter address `localhost:8888`, and select `Lincoln2017MKZ` from the `vehicle` menu.
 - Be sure to also select the correct map in Dreamview for the desired test case.
@@ -133,7 +133,7 @@ Running a simulation requires AssetBundles for the map and vehicle as well as co
 
 If errors appear due to previously-downloaded bundles from a previous version the Simulator, delete the Simulator persistent data folder located at `/home/[username]/.config/unity3d/LG Silicon Valley Lab/LGSVL Simulator`.
 
-See simulator documentation for [how to add a map](https://www.lgsvlsimulator.com/docs/maps-tab/#how-to-add-a-map) and [how to add a vehicle](https://www.lgsvlsimulator.com/docs/vehicles-tab/#where-to-find-vehicles). AssetBundles are available for download at [the lgsvl simulator content website](https://content.lgsvlsimulator.com).
+See simulator documentation for [how to add a map](https://www.svlsimulator.com/docs/maps-tab/#how-to-add-a-map) and [how to add a vehicle](https://www.svlsimulator.com/docs/vehicles-tab/#where-to-find-vehicles). AssetBundles are available for download at [the lgsvl simulator content website](https://content.svlsimulator.com).
 
 ### Python Runner
 
@@ -158,7 +158,7 @@ The Python Runner supports the following command line parameters when running a 
 - `-L, --log-level LEVEL` logging level
 - `-h, --help`            show help message and exit
 
-  
+
 #### Python Runner Environment Variables
 
 The Python Runner supports the following environment variables (and default values) when running a test case:
@@ -168,7 +168,7 @@ The Python Runner supports the following environment variables (and default valu
 - `BRIDGE_HOST=localhost`
 - `BRIDGE_PORT=9090`
 
-If simulator is being run on a separate machine than the Python Runner make sure to set the `SIMULATOR_HOST` environment variable with the IP address of the machine running the simulator; for example `export SIMULATOR_HOST=192.168.0.2`. 
+If simulator is being run on a separate machine than the Python Runner make sure to set the `SIMULATOR_HOST` environment variable with the IP address of the machine running the simulator; for example `export SIMULATOR_HOST=192.168.0.2`.
 
 The `BRIDGE_HOST` machine is the machine which is running Apollo (and the CyberRT bridge) and is most likely also the same machine running Python Runner. If simulator and Apollo are running on the same machine, use the default value of `localhost`. Otherwise, set `BRIDGE_HOST` to the IP address of the machine running Apollo; for example `export BRIDGE_HOST=192.168.0.1`.
 
@@ -185,7 +185,7 @@ There are several example test cases provided with the Python Runner in this pre
 | red-light-runner.py |   MKZ   | Borregas Ave                     | other side of intersection |
 | sudden-braking.py   |   MKZ   | SingleLaneRoad                   | end of the map |
 
-Note that each map must be loaded and available in the Simulator Maps view, and the corresponding Apollo map must be available and selected in Dreamview. 
+Note that each map must be loaded and available in the Simulator Maps view, and the corresponding Apollo map must be available and selected in Dreamview.
 
 Also note that changing maps in Dreamview will disable the modules so you will need to re-enable them as described above.
 
