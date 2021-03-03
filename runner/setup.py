@@ -102,7 +102,7 @@ setup(
     },
     install_requires=["lgsvl", ],
     setup_requires=[
-        "GitPython"
+        "GitPython==3.1.14"
     ],
     license="Other",
     classifiers=[
