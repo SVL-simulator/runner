@@ -1,18 +1,18 @@
 # Scenario runner for SVL Simulator
 
-The scenario runner provides an environment for running PythonApi and Visual Scenario Editor (VSE) scripts with the SVL simulator.
+The scenario runner provides an environment for running PythonApi and Visual Scenario Editor (VSE) scripts with the SVL Simulator.
 
 ## Requirements
 - Linux operating system
 - Docker
-- SVL simulator
+- SVL Simulator
 
-## Installation with SVL simulator binary
+## Installation with SVL Simulator binary
 
-The release bundle for the scenario runner can be installed in the simulator binary directory.
+The release bundle for the scenario runner can be installed in the SVL Simulator binary directory.
 To install follow these steps:
 
-1. Download and extract the simulator release binary (2021.1 release or later)
+1. Download and extract the SVL Simulator release binary (2021.1 release or later)
 2. Download and extract the scenario runner bundle
 3. Open a terminal and navigate to the `scripts` directory in the extracted directory for the scenario runner:
     ```
@@ -20,10 +20,10 @@ To install follow these steps:
     ```
 4. Run the install script:
     ```
-    ./install_scenario_runner.sh path_to_lgsvl_simulator_binary copy
+    ./install_scenario_runner.sh PATH_TO_SVL_SIMULATOR_BINARY copy
     ```
 
-Once the installation is complete the scenario runner will be used through the SVL simulator web interface directly when the PythonApi or VSE templates are selected during simulation creation.
+Once the installation is complete the scenario runner will be used when the Python API or VSE templates are selected during simulation creation.
 
 
 ## Building and running in developer mode
