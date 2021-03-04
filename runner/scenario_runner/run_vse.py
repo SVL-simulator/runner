@@ -239,7 +239,10 @@ class VSERunner:
             position = lgsvl.Vector.from_json(waypoint_data["position"])
             speed = waypoint_data["speed"]
             angle = lgsvl.Vector.from_json(waypoint_data["angle"])
-            wait_time = waypoint_data["wait_time"]
+            if "wait_time" in waypoint_data:
+                wait_time = waypoint_data["wait_time"]
+            else:
+                wait_time = waypoint_data["waitTime"]
             trigger = self.read_trigger(waypoint_data)
             waypoint = lgsvl.DriveWaypoint(position, speed, angle=angle, idle=wait_time, trigger=trigger)
             waypoints.append(waypoint)
@@ -282,7 +285,7 @@ class VSERunner:
 
         log.info("Starting scenario...")
         self.sim.run(duration)
-        log.info("Scenario simualtion ended.")
+        log.info("Scenario simulation ended.")
 
 
 if __name__ == "__main__":
