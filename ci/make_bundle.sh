@@ -35,12 +35,6 @@ function copy_scripts {
     cp ./scripts/install-testcase-runtime.sh $DIST_PATH/install-testcase-runtime.sh
 }
 
-function copy_scenarios {
-    mkdir -p $DIST_PATH/scenarios
-    cp -r scenarios/Python $DIST_PATH/scenarios
-    cp -r scenarios/VSE $DIST_PATH/scenarios
-}
-
 function copy_docs {
     copy_docs_${BUNDLE_FLAVOR}
 }
@@ -70,7 +64,6 @@ mkdir -p $DIST_PATH
 
 save_docker_images
 copy_scripts
-copy_scenarios
 # copy_docs
 
 # Some housekeeping

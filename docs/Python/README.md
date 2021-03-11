@@ -39,13 +39,6 @@ lgsvlsimulator-scenarios-2020.05P-python-api
 ├── docs
 │ ├── images
 │ └── README.md
-├── scenarios
-│   ├── NHTSA
-│   └── SampleTestCases
-│       ├── cut-in.py
-│       ├── ped-crossing.py
-│       ├── red-light-runner.py
-│       └── sudden-braking.py
 ├── install-testcase-runtime.sh
 └── lgsvl_scenario.sh
 ```
