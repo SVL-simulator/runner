@@ -76,29 +76,20 @@ pipeline {
               DOCKER_REPO_SUFFIX="/`echo ${BRANCH_NAME} | tr / -  | tr [:upper:] [:lower:]`"
           fi
 
-          docker build -f docker/Dockerfile -t scenarios-runner-tmp --pull --no-cache \
-                       --build-arg PYTHON_INSTALL_ENV='SCENARIO_RUNNER__BUILD_KIND=official' .
-          TEMP_CONT=`docker create --name scenarios-runner-tmp scenarios-runner-tmp`
-
-          cat <<! > image-info.source
-IMAGE_APP=scenarios/runner
-IMAGE_CREATED_BY=auto-jenkins
-IMAGE_CREATED_FROM=\$(git describe --always --tags)
-IMAGE_CREATED_FROM_SUBMODULES="\$(git submodule | xargs)"
-IMAGE_CREATED_ON=\$(date --iso-8601=seconds --utc)
-IMAGE_TAG=\$DOCKER_TAG
-# Increment IMAGE_INTERFACE_VERSION whenever changes to the image require that the launcher be updated.
-IMAGE_INTERFACE_VERSION=2
-IMAGE_UUID=\$(uuidgen)
-!
-          docker cp image-info.source \$TEMP_CONT:/etc/wise-image-info.source
-          rm -f image-info.source
-          docker commit \$TEMP_CONT ${GITLAB_HOST}:4567/${GITLAB_REPO}\$DOCKER_REPO_SUFFIX:\$DOCKER_TAG
-          docker rm \$TEMP_CONT
-          docker rmi scenarios-runner-tmp
-
-          docker build -f docker/Dockerfile.devenv -t ${GITLAB_HOST}:4567/${GITLAB_REPO}\$DOCKER_REPO_SUFFIX/testenv:\$DOCKER_TAG \
-                               --build-arg BASE_IMAGE=${GITLAB_HOST}:4567/${GITLAB_REPO}\$DOCKER_REPO_SUFFIX:\$DOCKER_TAG .
+          docker build -f docker/Dockerfile \
+                       --pull \
+                       --no-cache \
+                       --build-arg PYTHON_INSTALL_ENV='SCENARIO_RUNNER__BUILD_KIND=official' \
+                       --build-arg image_git_describe="\$(git describe --always --tags)" \
+                       --build-arg image_git_describe_submodules="\$(git submodule | xargs)" \
+                       --build-arg image_tag=\$DOCKER_TAG \
+                       --build-arg image_uuidgen=\$(uuidgen) \
+                       -t ${GITLAB_HOST}:4567/${GITLAB_REPO}\$DOCKER_REPO_SUFFIX:\$DOCKER_TAG \
+                       .
+          docker build -f docker/Dockerfile.devenv \
+                       --build-arg BASE_IMAGE=${GITLAB_HOST}:4567/${GITLAB_REPO}\$DOCKER_REPO_SUFFIX:\$DOCKER_TAG \
+                       -t ${GITLAB_HOST}:4567/${GITLAB_REPO}\$DOCKER_REPO_SUFFIX/testenv:\$DOCKER_TAG \
+                       .
 
           docker push ${GITLAB_HOST}:4567/${GITLAB_REPO}\$DOCKER_REPO_SUFFIX:\$DOCKER_TAG
 

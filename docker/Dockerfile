@@ -46,3 +46,22 @@ RUN set -ex \
         netcat-openbsd \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
+
+ARG image_git_describe=(unknown)
+ARG image_git_describe_submodules=(unknown)
+ARG image_tag=(unset)
+ARG image_uuidgen=(unset)
+
+RUN set -ex \
+  && echo "IMAGE_APP=scenarios/runner\n\
+IMAGE_CREATED_BY=auto-jenkins\n\
+IMAGE_CREATED_FROM=${image_git_describe}\n\
+IMAGE_CREATED_FROM_SUBMODULES='${image_git_describe_submodules}'\n\
+IMAGE_CREATED_ON=$(date --iso-8601=seconds --utc)\n\
+IMAGE_TAG=${image_tag}\n\
+# Increment IMAGE_INTERFACE_VERSION whenever changes to the image require that the launcher be updated.\n\
+IMAGE_INTERFACE_VERSION=2\n\
+IMAGE_UUID=${image_uuidgen}"\
+  >> /etc/wise-image-info.source \
+  && echo "Scenarios/runner wise-image-info.source:" \
+  && cat /etc/wise-image-info.source
