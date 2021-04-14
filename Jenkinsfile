@@ -47,7 +47,7 @@ pipeline {
             trackingSubmodules: false]
           ],
           userRemoteConfigs: [[
-            credentialsId: "Jenkins-Gitlab",
+            credentialsId: "auto-gitlab",
             url: "git@${GITLAB_HOST}:HDRP/Scenarios/runner.git"
           ]]
         ])
