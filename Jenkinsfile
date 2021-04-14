@@ -54,17 +54,28 @@ pipeline {
       }
     }
 
-    stage("build") {
+    stage("DockerLogin") {
       environment {
-        DOCKER = credentials("Jenkins-Gitlab")
+        DOCKERHUB_DOCKER_REGISTRY = credentials("dockerhub-docker-registry")
+        AUTO_GITLAB_DOCKER_REGISTRY = credentials("auto-gitlab-docker-registry")
       }
+      steps {
+        dir("Jenkins") {
+          sh """
+            docker login -u "${DOCKERHUB_DOCKER_REGISTRY_USR}" -p "${DOCKERHUB_DOCKER_REGISTRY_PSW}"
+            docker login -u "${AUTO_GITLAB_DOCKER_REGISTRY_USR}" -p "${AUTO_GITLAB_DOCKER_REGISTRY_PSW}" ${GITLAB_HOST}:4567
+          """
+        }
+      }
+    }
+
+    stage("build") {
       steps {
         sh """
           if [ "${BRANCH_NAME}" != "${DEFAULT_BRANCH_NAME}" ]; then
               DOCKER_REPO_SUFFIX="/`echo ${BRANCH_NAME} | tr / -  | tr [:upper:] [:lower:]`"
           fi
 
-          docker login -u ${DOCKER_USR} -p ${DOCKER_PSW} ${GITLAB_HOST}:4567
           docker build -f docker/Dockerfile -t scenarios-runner-tmp --pull --no-cache \
                        --build-arg PYTHON_INSTALL_ENV='SCENARIO_RUNNER__BUILD_KIND=official' .
           TEMP_CONT=`docker create --name scenarios-runner-tmp scenarios-runner-tmp`
