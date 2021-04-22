@@ -2,6 +2,19 @@
 
 from setuptools import setup
 
+# Without enabling the user site, "python3 -m pip install --user -e ." fails
+# with:
+#
+#  WARNING: The user site-packages directory is disabled.
+#  error: can't create or remove files in install directory
+#  ...
+#  [Errno 13] Permission denied: '/usr/local/lib/python3.6/dist-packages/<FILE>'
+#
+# Taken from https://github.com/pypa/pip/issues/7953#issuecomment-645133255.
+import site
+import sys
+site.ENABLE_USER_SITE = "--user" in sys.argv[1:]
+
 
 def get_version(git_tag):
     """
