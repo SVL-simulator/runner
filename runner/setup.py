@@ -50,10 +50,6 @@ def get_version(git_tag):
     empty. If SCENARIO_RUNNER__BUILD_KIND is not in the enviroment, 'dev' is
     used for this segment.
 
-    Note that in order to force installation when only the local version
-    label has changed, the "--upgrade" option must be supplied to
-    "pip3 install".
-
     NB. - Not using https://pypi.org/project/setuptools-git-version/ because it
           passes "--long" to "git describe".
         - Not using https://pypi.org/project/setuptools-scm/ because it's way
