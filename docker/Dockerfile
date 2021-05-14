@@ -2,11 +2,6 @@
 # Use the non-slim image because it already has git pre-installed.
 FROM python:3.6.13-buster AS builder
 
-# numpy-1.20 requires python 3.7
-RUN python3 -m pip install \
-    environs \
-    numpy\<1.20
-
 # The "git describe" done by get_version() in runner/setup.py needs .git (and the "git describe" done by get_version() in
 # externals/PythonApi/setup.py needs its subdirectory .git/modules/externals/PythonApi):
 ADD .git /app/.git
@@ -14,7 +9,7 @@ ADD .git /app/.git
 ADD externals /app/externals
 RUN set -ex \
     && cd /app/externals/PythonApi \
-    && python3 -m pip install .
+    && python3 -m pip install . -r requirements.txt
 
 ARG PYTHON_INSTALL_ENV
 ADD runner /app/runner
