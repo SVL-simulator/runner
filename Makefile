@@ -20,9 +20,6 @@ endif
 build-base:
 	docker build ${DOCKER_BUILD_OPTS} -f docker/Dockerfile -t local/scenario_runner_base .
 
-build-python-api:
-	docker build ${DOCKER_BUILD_OPTS} -f docker/Dockerfile.python-api -t local/python_api_runner_base .
-
 build-devenv: build-base
 	docker build ${DOCKER_BUILD_OPTS} -f docker/Dockerfile.devenv --build-arg BASE_IMAGE=local/scenario_runner_base -t local/scenario_runner_devenv .
 
