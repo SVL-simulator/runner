@@ -1,14 +1,19 @@
 # As of 2021-02-16, 3.6[-slim] == 3.6.13[-slim]-buster
 # Use the non-slim image because it already has git pre-installed.
-FROM python:3.6.13-buster AS builder
+ARG PYTHON_VERSION_MAJOR_MINOR=3.6
+ARG PYTHON_VERSION_PATCH=.13
+FROM python:${PYTHON_VERSION_MAJOR_MINOR}${PYTHON_VERSION_PATCH}-buster AS builder
 
 # The "git describe" done by get_version() in runner/setup.py needs .git (and the "git describe" done by get_version() in
 # externals/PythonApi/setup.py needs its subdirectory .git/modules/externals/PythonApi):
 ADD .git /app/.git
 
 ADD externals /app/externals
-COPY requirements.txt /app/
+
+# NOTE: The line below is parsed by ../Makefile to get the default value of REQUIREMENTS_TXT.
+ARG REQUIREMENTS_TXT=requirements.txt
 ARG GENERATE_REQUIREMENTS_TXT=false
+COPY ${REQUIREMENTS_TXT} /app/requirements.txt
 RUN set -ex; \
     requirements=/app/requirements.txt; \
     if ${GENERATE_REQUIREMENTS_TXT} || ! [ -s $requirements ]; then requirements=/app/externals/PythonApi/requirements.txt; fi; \
@@ -21,9 +26,11 @@ RUN set -ex \
     && cd /app/runner \
     && eval ${PYTHON_INSTALL_ENV} python3 -m pip install .
 
-FROM python:3.6.13-slim-buster
+FROM python:${PYTHON_VERSION_MAJOR_MINOR}${PYTHON_VERSION_PATCH}-slim-buster
 
-COPY --from=builder /usr/local/lib/python3.6/site-packages /usr/local/lib/python3.6/site-packages
+ARG PYTHON_VERSION_MAJOR_MINOR
+COPY --from=builder /usr/local/lib/python${PYTHON_VERSION_MAJOR_MINOR}/site-packages \
+                    /usr/local/lib/python${PYTHON_VERSION_MAJOR_MINOR}/site-packages
 COPY --from=builder /usr/local/bin/run* /usr/local/bin/
 
 COPY \
@@ -62,3 +69,7 @@ IMAGE_UUID=${image_uuidgen}"\
   >> /etc/wise-image-info.source \
   && echo "Scenarios/runner wise-image-info.source:" \
   && cat /etc/wise-image-info.source
+
+RUN echo OS_$(grep '^VERSION=' /etc/os-release) \
+    && echo PYTHON_VERSION=${PYTHON_VERSION} \
+    && echo PYTHON_PIP_VERSION=${PYTHON_PIP_VERSION}

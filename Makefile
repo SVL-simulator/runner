@@ -16,17 +16,43 @@ ifdef NO_BUILD_CACHE
 DOCKER_BUILD_OPTS:=--pull --no-cache
 endif
 
+# PYTHON_VERSION_TAG is the version portion of the tag of the Python base image to be used. It can be MAJOR.MINOR.PATCH or just
+# MAJOR.MINOR .
+ifdef PYTHON_VERSION_TAG
+RUNNER_BASE_TAG:=python-$(PYTHON_VERSION_TAG)
+REQUIREMENTS_TXT:=requirements-$(PYTHON_VERSION_TAG).txt
+BUILD_ARG__PYTHON_VERSION_MAJOR_MINOR:=$(shell set - $(subst ., ,$(PYTHON_VERSION_TAG)); echo --build-arg PYTHON_VERSION_MAJOR_MINOR=$$1.$$2)
+# BUILD_ARG__PYTHON_VERSION_PATCH includes the leading "." unless there isn't a patch version field in PYTHON_VERSION_TAG, in
+# which case the value is empty.
+BUILD_ARG__PYTHON_VERSION_PATCH:=$(shell set - $(subst ., ,$(PYTHON_VERSION_TAG)); echo --build-arg PYTHON_VERSION_PATCH=$${3:+.$${3}})
+BUILD_ARG__REQUIREMENTS_TXT:=--build-arg REQUIREMENTS_TXT=$(REQUIREMENTS_TXT)
+else
+RUNNER_BASE_TAG:=latest
+# Use the defaults specified in docker/Dockerfile for PYTHON_VERSION_MAJOR_MINOR, PYTHON_VERSION_PATCH, and REQUIREMENTS_TXT.
+# However, the latter is needed in this file, so extract its default from there.
+REQUIREMENTS_TXT:=$(shell awk 'toupper($$1) == "ARG" && $$2 ~ /^REQUIREMENTS_TXT=/ { print gensub(/^REQUIREMENTS_TXT=/, "", 1, $$2); exit }' docker/Dockerfile)
+endif
+
 build-base:
-	docker build $(DOCKER_BUILD_OPTS) -f docker/Dockerfile -t local/scenario_runner_base .
+	docker build $(DOCKER_BUILD_OPTS) -f docker/Dockerfile \
+		-t local/scenario_runner_base:$(RUNNER_BASE_TAG) \
+		$(BUILD_ARG__PYTHON_VERSION_MAJOR_MINOR) \
+		$(BUILD_ARG__PYTHON_VERSION_PATCH) \
+		$(BUILD_ARG__REQUIREMENTS_TXT) \
+		.
 
 upgrade-base-dependencies:
+	touch $(REQUIREMENTS_TXT)
 	docker build --pull --no-cache -f docker/Dockerfile \
 		--target builder \
 		-t local/scenario_runner_base_requirements \
+		$(BUILD_ARG__PYTHON_VERSION_MAJOR_MINOR) \
+		$(BUILD_ARG__PYTHON_VERSION_PATCH) \
+		$(BUILD_ARG__REQUIREMENTS_TXT) \
 		--build-arg GENERATE_REQUIREMENTS_TXT=true \
 		.
 	# Don't include the packages that we build.
-	docker run --rm local/scenario_runner_base_requirements python3 -m pip freeze | grep -v '@ file://' > requirements.txt
+	docker run --rm local/scenario_runner_base_requirements python3 -m pip freeze | grep -v '@ file://' > $(REQUIREMENTS_TXT)
 	docker image rm local/scenario_runner_base_requirements
 
 build-devenv: build-base

@@ -37,14 +37,28 @@ To run in developer mode follow these steps:
     run PATH_TO_SCENARIO
     ```
 
-## Upgrade dependencies
+## Building with arbritary Python versions
 
-The versions of the dependencies are pinned by the `requirements.txt` file. Whenever dependencies are changed, update it by
-running:
+To build the `local/scenario_runner_base` image with a different version of Python from the default, run:
 
 ```
-    $ make upgrade-base-dependencies
+    $ make PYTHON_VERSION_TAG=<VERSION> build-base
 ```
+
+The image will be tagged with `python-<VERSION>` insted of `latest`.
+
+The `local/scenario_runner_devenv` image is not affected by this setting.
+
+## Upgrading dependencies
+
+The versions of the dependencies are pinned by the `requirements[-<PYTHON_VERSION_TAG>].txt` files. Whenever dependencies are
+changed, update them by running:
+
+```
+    $ make [PYTHON_VERSION_TAG=<VERSION>] upgrade-base-dependencies
+```
+
+for each of the values of `PYTHON_VERSION_TAG` being used.
 
 ## Building bundle locally
 
