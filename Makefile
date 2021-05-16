@@ -14,14 +14,13 @@ export BUILD_REF
 # To disable "docker build" from using cached base images and layers, invoke "make" with NO_BUILD_CACHE=1.
 ifdef NO_BUILD_CACHE
 DOCKER_BUILD_OPTS:=--pull --no-cache
-export DOCKER_BUILD_OPTS
 endif
 
 build-base:
-	docker build ${DOCKER_BUILD_OPTS} -f docker/Dockerfile -t local/scenario_runner_base .
+	docker build $(DOCKER_BUILD_OPTS) -f docker/Dockerfile -t local/scenario_runner_base .
 
 build-devenv: build-base
-	docker build ${DOCKER_BUILD_OPTS} -f docker/Dockerfile.devenv --build-arg BASE_IMAGE=local/scenario_runner_base -t local/scenario_runner_devenv .
+	docker build $(DOCKER_BUILD_OPTS) -f docker/Dockerfile.devenv --build-arg BASE_IMAGE=local/scenario_runner_base -t local/scenario_runner_devenv .
 
 build: compose-build list-devenv-images
 
