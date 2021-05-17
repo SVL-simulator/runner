@@ -43,7 +43,7 @@ def parse_args():
                         default='INFO', help="Logging level")
 
     parser.add_argument("--duration", '-d', type=float,
-                        default=20.,
+                        default=0.,
                         help="Scenario duration in seconds. (default: %(default)s)")
 
     parser.add_argument("--force-duration", '-f', action='store_true',
