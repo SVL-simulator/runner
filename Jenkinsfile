@@ -23,10 +23,11 @@ pipeline {
     PYTHONUNBUFFERED = "1"
     JENKINS_BUILD_ID = "${BUILD_ID}"
     DOCKER_TAG = "build__${JENKINS_BUILD_ID}"
+    GIT_VER = "${sh(script:'[ -n "${GIT_TAG}" ] && echo "refs/tags/${GIT_TAG}" || echo "refs/heads/${BRANCH_NAME}"', returnStdout: true).trim()}"
     GITLAB_REPO = "hdrp/scenarios/runner/jenkins"
     ECR_REPO = "wise/testcase"
-    // used to keep DOCKER_REPO_SUFFIX empty
-    DEFAULT_BRANCH_NAME = "master"
+    DOCKER_REPO_SUFFIX = "${sh(script:'[ "${BRANCH_NAME}" != "master" ] && /bin/echo -n "/" && echo "${BRANCH_NAME}" | tr / -  | tr [:upper:] [:lower:] || true', returnStdout: true).trim()}"
+    GIT_TAG_FOR_DOCKER = "${sh(script:'echo "${GIT_TAG}" | tr / -  | tr [:upper:] [:lower:]', returnStdout: true).trim()}"
   }
 
   stages {
@@ -34,7 +35,7 @@ pipeline {
       steps {
         checkout([
           $class: "GitSCM",
-          branches: [[name: "refs/heads/${BRANCH_NAME}"]],
+          branches: [[name: "${GIT_VER}"]],
           browser: [$class: "GitLab", repoUrl: "https://${GITLAB_HOST}/HDRP/Scenarios/runner", version: env.GITLAB_VERSION],
           doGenerateSubmoduleConfigurations: false,
           extensions: [
@@ -72,10 +73,6 @@ pipeline {
     stage("build") {
       steps {
         sh """
-          if [ "${BRANCH_NAME}" != "${DEFAULT_BRANCH_NAME}" ]; then
-              DOCKER_REPO_SUFFIX="/`echo ${BRANCH_NAME} | tr / -  | tr [:upper:] [:lower:]`"
-          fi
-
           docker build -f docker/Dockerfile \
                        --pull \
                        --no-cache \
@@ -93,10 +90,14 @@ pipeline {
 
           docker push ${GITLAB_HOST}:4567/${GITLAB_REPO}\$DOCKER_REPO_SUFFIX:\$DOCKER_TAG
 
-          if [ "${BRANCH_NAME}" = "${DEFAULT_BRANCH_NAME}" ]; then
+          if [ ! -n "${GIT_TAG}" ]; then
               docker tag  ${GITLAB_HOST}:4567/${GITLAB_REPO}\$DOCKER_REPO_SUFFIX:\$DOCKER_TAG \
                           ${GITLAB_HOST}:4567/${GITLAB_REPO}\$DOCKER_REPO_SUFFIX:latest
               docker push ${GITLAB_HOST}:4567/${GITLAB_REPO}\$DOCKER_REPO_SUFFIX:latest
+          else
+              docker tag  ${GITLAB_HOST}:4567/${GITLAB_REPO}\$DOCKER_REPO_SUFFIX:\$DOCKER_TAG \
+                          ${GITLAB_HOST}:4567/${GITLAB_REPO}\$DOCKER_REPO_SUFFIX:version__${GIT_TAG_FOR_DOCKER}_${JENKINS_BUILD_ID}
+              docker push ${GITLAB_HOST}:4567/${GITLAB_REPO}\$DOCKER_REPO_SUFFIX:version__${GIT_TAG_FOR_DOCKER}_${JENKINS_BUILD_ID}
           fi
         """
       }
@@ -106,9 +107,6 @@ pipeline {
     stage("test") {
       steps {
         sh """
-          if [ "${BRANCH_NAME}" != "${DEFAULT_BRANCH_NAME}" ]; then
-              DOCKER_REPO_SUFFIX="/`echo ${BRANCH_NAME} | tr / -  | tr [:upper:] [:lower:]`"
-          fi
           docker run -t ${GITLAB_HOST}:4567/${GITLAB_REPO}\$DOCKER_REPO_SUFFIX/testenv:\$DOCKER_TAG pytest -s -v runner/tests
         """
       }
@@ -116,9 +114,6 @@ pipeline {
     stage("bundle") {
       steps {
         sh """
-          if [ "${BRANCH_NAME}" != "${DEFAULT_BRANCH_NAME}" ]; then
-              DOCKER_REPO_SUFFIX="/`echo ${BRANCH_NAME} | tr / -  | tr [:upper:] [:lower:]`"
-          fi
           ./ci/make_bundle.sh ${DOCKER_TAG} ${GITLAB_HOST}:4567/${GITLAB_REPO}\$DOCKER_REPO_SUFFIX:\$DOCKER_TAG
           mv dist/lgsvlsimulator-scenarios-\$DOCKER_TAG .
         """
@@ -130,9 +125,6 @@ pipeline {
           sh "echo Using credentials ${WISE_AWS_ECR_CREDENTIALS_ID}"
           withCredentials([[credentialsId: "${WISE_AWS_ECR_CREDENTIALS_ID}", accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY', $class: 'AmazonWebServicesCredentialsBinding']]) {
             sh """
-              if [ "${BRANCH_NAME}" != "${DEFAULT_BRANCH_NAME}" ]; then
-                DOCKER_REPO_SUFFIX="/`echo ${BRANCH_NAME} | tr / -  | tr [:upper:] [:lower:]`"
-              fi
               DOCKER_REGISTRY="${WISE_AWS_ECR_ACCOUNT_ID}.dkr.ecr.${WISE_AWS_ECR_REGION}.amazonaws.com"
               # According to https://hub.docker.com/r/amazon/aws-cli, the version tags are immutable => no need to force pulling.
               AWSCLI="amazon/aws-cli:2.2.4"
@@ -146,6 +138,12 @@ pipeline {
               fi
               docker tag ${GITLAB_HOST}:4567/${GITLAB_REPO}\$DOCKER_REPO_SUFFIX:\$DOCKER_TAG \$DOCKER_REGISTRY/\$ECR_REPO\$DOCKER_REPO_SUFFIX:\$DOCKER_TAG
               docker push \$DOCKER_REGISTRY/\$ECR_REPO\$DOCKER_REPO_SUFFIX:\$DOCKER_TAG
+              if [ -n "${GIT_TAG}" ]; then
+                  docker tag  ${GITLAB_HOST}:4567/${GITLAB_REPO}\$DOCKER_REPO_SUFFIX:\$DOCKER_TAG \
+                              \$DOCKER_REGISTRY/\$ECR_REPO\$DOCKER_REPO_SUFFIX:version__${GIT_TAG_FOR_DOCKER}_${JENKINS_BUILD_ID}
+                  docker push \$DOCKER_REGISTRY/\$ECR_REPO\$DOCKER_REPO_SUFFIX:version__${GIT_TAG_FOR_DOCKER}_${JENKINS_BUILD_ID}
+                  docker image rm \$DOCKER_REGISTRY/\$ECR_REPO\$DOCKER_REPO_SUFFIX:version__${GIT_TAG_FOR_DOCKER}_${JENKINS_BUILD_ID}
+              fi
 
               docker image rm \
                   ${GITLAB_HOST}:4567/${GITLAB_REPO}\$DOCKER_REPO_SUFFIX:\$DOCKER_TAG \
