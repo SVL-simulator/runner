@@ -98,10 +98,6 @@ pipeline {
                        --build-arg image_uuidgen=\$(uuidgen) \
                        -t ${GITLAB_HOST}:4567/${GITLAB_REPO}\$DOCKER_REPO_SUFFIX:\$DOCKER_TAG \
                        .
-          docker build -f docker/Dockerfile.devenv \
-                       --build-arg BASE_IMAGE=${GITLAB_HOST}:4567/${GITLAB_REPO}\$DOCKER_REPO_SUFFIX:\$DOCKER_TAG \
-                       -t ${GITLAB_HOST}:4567/${GITLAB_REPO}\$DOCKER_REPO_SUFFIX/testenv:\$DOCKER_TAG \
-                       .
 
           docker push ${GITLAB_HOST}:4567/${GITLAB_REPO}\$DOCKER_REPO_SUFFIX:\$DOCKER_TAG
 
@@ -118,23 +114,6 @@ pipeline {
       }
     }
 
-/*
-    stage("test") {
-      steps {
-        sh """
-          docker run -t ${GITLAB_HOST}:4567/${GITLAB_REPO}\$DOCKER_REPO_SUFFIX/testenv:\$DOCKER_TAG pytest -s -v runner/tests
-        """
-      }
-    }
-    stage("bundle") {
-      steps {
-        sh """
-          ./ci/make_bundle.sh ${DOCKER_TAG} ${GITLAB_HOST}:4567/${GITLAB_REPO}\$DOCKER_REPO_SUFFIX:\$DOCKER_TAG
-          mv dist/lgsvlsimulator-scenarios-\$DOCKER_TAG .
-        """
-      }
-    }
-*/
     stage("uploadECR") {
       steps {
           sh "echo Using credentials ${WISE_AWS_ECR_CREDENTIALS_ID}"
@@ -162,7 +141,6 @@ pipeline {
 
               docker image rm \
                   ${GITLAB_HOST}:4567/${GITLAB_REPO}\$DOCKER_REPO_SUFFIX:\$DOCKER_TAG \
-                  ${GITLAB_HOST}:4567/${GITLAB_REPO}\$DOCKER_REPO_SUFFIX/testenv:\$DOCKER_TAG \
                   \$DOCKER_REGISTRY/\$ECR_REPO\$DOCKER_REPO_SUFFIX:\$DOCKER_TAG
             """
         }
