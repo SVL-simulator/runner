@@ -5,6 +5,15 @@ pipeline {
     }
   }
 
+  post {
+    failure {
+      updateGitlabCommitStatus name: 'build', state: 'failed'
+    }
+    success {
+      updateGitlabCommitStatus name: 'build', state: 'success'
+    }
+  }
+
   options {
     gitLabConnection("${GITLAB_HOST}")
     skipDefaultCheckout(true)
@@ -32,6 +41,11 @@ pipeline {
   }
 
   stages {
+    stage("NotifyGitlab") {
+      steps {
+        updateGitlabCommitStatus name: 'build', state: 'running'
+      }
+    }
     stage("Git") {
       steps {
         checkout([
