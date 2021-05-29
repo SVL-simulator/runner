@@ -14,6 +14,7 @@ pipeline {
 
   parameters {
     string(name: 'BRANCH_NAME', defaultValue: 'master', description: 'Branch from HDRP/Scenarios/runner to build', trim: true)
+    string(name: 'GIT_TAG', defaultValue: '', description: 'Tag from HDRP/Scenarios/runner to build as a release (will be pushed with version__<tag>_<build-number> docker tag)', trim: true)
     string(name: 'WISE_AWS_ECR_ACCOUNT_ID', defaultValue: '853285614468', description: 'The AWS account ID whose ECR will be used', trim: true)
     string(name: 'WISE_AWS_ECR_REGION', defaultValue: 'us-east-1', description: 'The AWS region where the ECR is located', trim: true)
     credentials( name: 'WISE_AWS_ECR_CREDENTIALS_ID', required: true, defaultValue: "simulator--aws-credentials", description: 'The credentials to be used for accessing the ECR', credentialType: 'com.cloudbees.jenkins.plugins.awscredentials.AWSCredentialsImpl')
@@ -90,14 +91,14 @@ pipeline {
 
           docker push ${GITLAB_HOST}:4567/${GITLAB_REPO}\$DOCKER_REPO_SUFFIX:\$DOCKER_TAG
 
-          if [ ! -n "${GIT_TAG}" ]; then
+          if [ -z "${env.GIT_TAG_FOR_DOCKER}" ]; then
               docker tag  ${GITLAB_HOST}:4567/${GITLAB_REPO}\$DOCKER_REPO_SUFFIX:\$DOCKER_TAG \
                           ${GITLAB_HOST}:4567/${GITLAB_REPO}\$DOCKER_REPO_SUFFIX:latest
               docker push ${GITLAB_HOST}:4567/${GITLAB_REPO}\$DOCKER_REPO_SUFFIX:latest
           else
               docker tag  ${GITLAB_HOST}:4567/${GITLAB_REPO}\$DOCKER_REPO_SUFFIX:\$DOCKER_TAG \
-                          ${GITLAB_HOST}:4567/${GITLAB_REPO}\$DOCKER_REPO_SUFFIX:version__${GIT_TAG_FOR_DOCKER}_${JENKINS_BUILD_ID}
-              docker push ${GITLAB_HOST}:4567/${GITLAB_REPO}\$DOCKER_REPO_SUFFIX:version__${GIT_TAG_FOR_DOCKER}_${JENKINS_BUILD_ID}
+                          ${GITLAB_HOST}:4567/${GITLAB_REPO}\$DOCKER_REPO_SUFFIX:version__${env.GIT_TAG_FOR_DOCKER}_${JENKINS_BUILD_ID}
+              docker push ${GITLAB_HOST}:4567/${GITLAB_REPO}\$DOCKER_REPO_SUFFIX:version__${env.GIT_TAG_FOR_DOCKER}_${JENKINS_BUILD_ID}
           fi
         """
       }
@@ -138,11 +139,11 @@ pipeline {
               fi
               docker tag ${GITLAB_HOST}:4567/${GITLAB_REPO}\$DOCKER_REPO_SUFFIX:\$DOCKER_TAG \$DOCKER_REGISTRY/\$ECR_REPO\$DOCKER_REPO_SUFFIX:\$DOCKER_TAG
               docker push \$DOCKER_REGISTRY/\$ECR_REPO\$DOCKER_REPO_SUFFIX:\$DOCKER_TAG
-              if [ -n "${GIT_TAG}" ]; then
+              if [ -z "${env.GIT_TAG_FOR_DOCKER}" ]; then
                   docker tag  ${GITLAB_HOST}:4567/${GITLAB_REPO}\$DOCKER_REPO_SUFFIX:\$DOCKER_TAG \
-                              \$DOCKER_REGISTRY/\$ECR_REPO\$DOCKER_REPO_SUFFIX:version__${GIT_TAG_FOR_DOCKER}_${JENKINS_BUILD_ID}
-                  docker push \$DOCKER_REGISTRY/\$ECR_REPO\$DOCKER_REPO_SUFFIX:version__${GIT_TAG_FOR_DOCKER}_${JENKINS_BUILD_ID}
-                  docker image rm \$DOCKER_REGISTRY/\$ECR_REPO\$DOCKER_REPO_SUFFIX:version__${GIT_TAG_FOR_DOCKER}_${JENKINS_BUILD_ID}
+                              \$DOCKER_REGISTRY/\$ECR_REPO\$DOCKER_REPO_SUFFIX:version__${env.GIT_TAG_FOR_DOCKER}_${JENKINS_BUILD_ID}
+                  docker push \$DOCKER_REGISTRY/\$ECR_REPO\$DOCKER_REPO_SUFFIX:version__${env.GIT_TAG_FOR_DOCKER}_${JENKINS_BUILD_ID}
+                  docker image rm \$DOCKER_REGISTRY/\$ECR_REPO\$DOCKER_REPO_SUFFIX:version__${env.GIT_TAG_FOR_DOCKER}_${JENKINS_BUILD_ID}
               fi
 
               docker image rm \
