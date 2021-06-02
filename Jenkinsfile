@@ -1,7 +1,7 @@
 pipeline {
   agent {
     node {
-      label "gpu-builder"
+      label "simulator-any"
     }
   }
 
