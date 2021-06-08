@@ -149,6 +149,7 @@ class VSERunner:
 
             try:
                 bridge_host = self.connect_bridge(ego, i)[0]
+
                 default_modules = [
                     'Localization',
                     'Perception',
@@ -160,6 +161,20 @@ class VSERunner:
                     'Control',
                     'Recorder'
                 ]
+
+                if agent.get("sensorsConfigurationId") in {
+                        lgsvl.wise.DefaultAssets.ego_lincoln2017mkz_apollo5_modular,
+                        lgsvl.wise.DefaultAssets.ego_lincoln2017mkz_apollo6_modular,
+                    }:
+                    default_modules = [
+                        'Localization',
+                        'Transform',
+                        'Routing',
+                        'Prediction',
+                        'Planning',
+                        'Control',
+                        'Recorder'
+                    ]
 
                 try:
                     modules = os.environ.get("LGSVL__AUTOPILOT_{}_VEHICLE_MODULES".format(i)).split(",")
