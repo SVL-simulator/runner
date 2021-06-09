@@ -52,6 +52,9 @@ def parse_args():
                         If not set, simulation will end by given duration or \
                         at the time when all NPCs' waypoints have been reached.")
 
+    parser.add_argument("--loop", '-l', action='store_true', default=False,
+                        help="Loop playback of VSE scenario")
+
     return parser.parse_args()
 
 
@@ -70,7 +73,7 @@ def main():
     elif args.scenario_file[-5:] == ".json":
         log.info("Run VSE scenario %s", args.scenario_file)
         vse_runner = VSERunner(args.scenario_file)
-        vse_runner.run(args.duration, args.force_duration)
+        vse_runner.run(args.duration, args.force_duration, args.loop)
     else:
         log.error("Failed to process file of unknown type %s", args.scenario_file)
 

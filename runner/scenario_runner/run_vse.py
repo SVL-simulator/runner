@@ -27,11 +27,18 @@ class VSERunner:
         self.npc_agents = []
         self.pedestrian_agents = []
 
+    def reset(self):
+        log.debug("Reset VSE runner")
+        self.ego_agents.clear()
+        self.npc_agents.clear()
+        self.pedestrian_agents.clear()
+
     def setup_sim(self, default_host="127.0.0.1", default_port=8181):
-        simulator_host = os.getenv('LGSVL__SIMULATOR_HOST', default_host)
-        simulator_port = int(os.getenv('LGSVL__SIMULATOR_PORT', default_port))
-        log.debug("simulator_host is {}, simulator_port is {}".format(simulator_host, simulator_port))
-        self.sim = lgsvl.Simulator(simulator_host, simulator_port)
+        if not self.sim:
+            simulator_host = os.getenv('LGSVL__SIMULATOR_HOST', default_host)
+            simulator_port = int(os.getenv('LGSVL__SIMULATOR_PORT', default_port))
+            log.debug("simulator_host is {}, simulator_port is {}".format(simulator_host, simulator_port))
+            self.sim = lgsvl.Simulator(simulator_host, simulator_port)
 
     def connect_bridge(self, ego_agent, ego_index=0, default_host="127.0.0.1", default_port=9090):
         autopilot_host_env = "LGSVL__AUTOPILOT_{}_HOST".format(ego_index)
@@ -288,28 +295,35 @@ class VSERunner:
 
         return trigger
 
-    def run(self, duration=0.0, force_duration=False):
+    def run(self, duration=0.0, force_duration=False, loop=False):
         log.debug("Duration is set to {}.".format(duration))
         self.setup_sim()
-        self.load_scene()
-        self.load_agents()
-        self.add_ego()  # Must go first since dreamview api may call sim.run()
-        self.add_npc()
-        self.add_pedestrian()
-        self.add_controllables()
 
-        def _on_agents_traversed_waypoints():
-            log.info("All agents traversed their waypoints.")
+        while True:
+            self.load_scene()
+            self.load_agents()
+            self.add_ego()  # Must go first since dreamview api may call sim.run()
+            self.add_npc()
+            self.add_pedestrian()
+            self.add_controllables()
 
-            if not force_duration:
-                log.info("Stopping simulation")
-                self.sim.stop()
+            def _on_agents_traversed_waypoints():
+                log.info("All agents traversed their waypoints.")
 
-        self.sim.agents_traversed_waypoints(_on_agents_traversed_waypoints)
+                if not force_duration:
+                    log.info("Stopping simulation")
+                    self.sim.stop()
 
-        log.info("Starting scenario...")
-        self.sim.run(duration)
-        log.info("Scenario simulation ended.")
+            self.sim.agents_traversed_waypoints(_on_agents_traversed_waypoints)
+
+            log.info("Starting scenario...")
+            self.sim.run(duration)
+            log.info("Scenario simulation ended.")
+
+            if loop:
+                self.reset()
+            else:
+                break
 
 
 if __name__ == "__main__":
