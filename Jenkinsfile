@@ -101,16 +101,28 @@ pipeline {
 
           docker push ${GITLAB_HOST}:4567/${GITLAB_REPO}\$DOCKER_REPO_SUFFIX:\$DOCKER_TAG
 
-          if [ -z "${env.GIT_TAG_FOR_DOCKER}" ]; then
-              docker tag  ${GITLAB_HOST}:4567/${GITLAB_REPO}\$DOCKER_REPO_SUFFIX:\$DOCKER_TAG \
-                          ${GITLAB_HOST}:4567/${GITLAB_REPO}\$DOCKER_REPO_SUFFIX:latest
-              docker push ${GITLAB_HOST}:4567/${GITLAB_REPO}\$DOCKER_REPO_SUFFIX:latest
-          else
+          if [ -n "${env.GIT_TAG_FOR_DOCKER}" ]; then
               docker tag  ${GITLAB_HOST}:4567/${GITLAB_REPO}\$DOCKER_REPO_SUFFIX:\$DOCKER_TAG \
                           ${GITLAB_HOST}:4567/${GITLAB_REPO}\$DOCKER_REPO_SUFFIX:version__${env.GIT_TAG_FOR_DOCKER}_${JENKINS_BUILD_ID}
               docker push ${GITLAB_HOST}:4567/${GITLAB_REPO}\$DOCKER_REPO_SUFFIX:version__${env.GIT_TAG_FOR_DOCKER}_${JENKINS_BUILD_ID}
           fi
         """
+      }
+    }
+
+    stage("push latest") {
+      when {
+        anyOf {
+          branch 'master'
+        }
+      }
+      steps {
+        sh script:"""
+          docker tag  ${GITLAB_HOST}:4567/${GITLAB_REPO}\$DOCKER_REPO_SUFFIX:\$DOCKER_TAG \
+                      ${GITLAB_HOST}:4567/${GITLAB_REPO}\$DOCKER_REPO_SUFFIX:latest
+
+          docker push ${GITLAB_HOST}:4567/${GITLAB_REPO}\$DOCKER_REPO_SUFFIX:latest
+          """, label:"${GITLAB_HOST}:4567/${GITLAB_REPO}\$DOCKER_REPO_SUFFIX:latest"
       }
     }
 
