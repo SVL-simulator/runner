@@ -8,6 +8,7 @@
 import json
 import logging
 import os
+import re
 import sys
 import lgsvl
 
@@ -119,7 +120,6 @@ class VSERunner:
                 if len(policy) > 0:
                     controllable.control(policy)
                 
-
     def add_ego(self):
         for i, agent in enumerate(self.ego_agents):
             if "id" in agent:
@@ -190,7 +190,14 @@ class VSERunner:
                 except Exception:
                     modules = default_modules
                 dv = lgsvl.dreamview.Connection(self.sim, ego, bridge_host)
-                dv.set_hd_map(os.environ.get("LGSVL__AUTOPILOT_HD_MAP", self.sim.current_scene))
+
+                hd_map = os.environ.get("LGSVL__AUTOPILOT_HD_MAP")
+                if not hd_map:
+                    hd_map = self.sim.current_scene
+                    words = self.split_pascal_case(hd_map)
+                    hd_map = ' '.join(words)
+
+                dv.set_hd_map(hd_map)
                 dv.set_vehicle(os.environ.get("LGSVL__AUTOPILOT_{}_VEHICLE_CONFIG".format(i), agent["variant"]))
                 if "destinationPoint" in agent:
                     dv.setup_apollo(agent_destination.x, agent_destination.z, modules)
@@ -294,6 +301,10 @@ class VSERunner:
         trigger = lgsvl.WaypointTrigger(effectors)
 
         return trigger
+
+    def split_pascal_case(self, s):
+        matches = re.finditer('.+?(?:(?<=[a-z])(?=[A-Z\d])|(?<=[A-Z\d])(?=[A-Z][a-z])|$)', s)
+        return [m.group(0) for m in matches]
 
     def run(self, duration=0.0, force_duration=False, loop=False):
         log.debug("Duration is set to {}.".format(duration))
