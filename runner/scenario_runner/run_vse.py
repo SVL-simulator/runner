@@ -235,7 +235,16 @@ class VSERunner:
             if agent["behaviour"]["name"] == "NPCWaypointBehaviour":
                 waypoints = self.read_waypoints(agent["waypoints"])
                 if waypoints:
-                    npc.follow(waypoints)
+                    if "waypoints_loop" in agent:
+                        if "waypoints_path_type" in agent:
+                            npc.follow(waypoints, agent["waypoints_loop"], agent["waypoints_path_type"])
+                        else:
+                            npc.follow(waypoints, agent["waypoints_loop"])
+                    else:
+                        if "waypoints_path_type" in agent:
+                            npc.follow(waypoints, False, agent["waypoints_path_type"])
+                        else:
+                            npc.follow(waypoints)
             elif agent["behaviour"]["name"] == "NPCLaneFollowBehaviour":
                 npc.follow_closest_lane(
                     True,
@@ -262,7 +271,16 @@ class VSERunner:
 
             waypoints = self.read_waypoints(agent["waypoints"])
             if waypoints:
-                pedestrian.follow(waypoints)
+                if "waypoints_loop" in agent:
+                    if "waypoints_path_type" in agent:
+                        pedestrian.follow(waypoints, agent["waypoints_loop"], agent["waypoints_path_type"])
+                    else:
+                        pedestrian.follow(waypoints, agent["waypoints_loop"])
+                else:
+                    if "waypoints_path_type" in agent:
+                        pedestrian.follow(waypoints, False, agent["waypoints_path_type"])
+                    else:
+                        pedestrian.follow(waypoints)
 
     def read_transform(self, transform_data):
         transform = lgsvl.Transform()
