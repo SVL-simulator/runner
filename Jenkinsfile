@@ -133,7 +133,7 @@ pipeline {
             sh """
               DOCKER_REGISTRY="${WISE_AWS_ECR_ACCOUNT_ID}.dkr.ecr.${WISE_AWS_ECR_REGION}.amazonaws.com"
               # According to https://hub.docker.com/r/amazon/aws-cli, the version tags are immutable => no need to force pulling.
-              AWSCLI="amazon/aws-cli:2.2.4"
+              AWSCLI="amazon/aws-cli:2.2.20"
 
               if ! docker run -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY --rm -t \$AWSCLI ecr get-login-password --region $WISE_AWS_ECR_REGION | docker login --username AWS --password-stdin \$DOCKER_REGISTRY; then
                 echo "ABORT: bad AWS credentials?"
