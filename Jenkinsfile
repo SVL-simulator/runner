@@ -92,7 +92,7 @@ pipeline {
                        --pull \
                        --no-cache \
                        --build-arg PYTHON_INSTALL_ENV='SCENARIO_RUNNER__BUILD_KIND=official' \
-                       --build-arg image_git_describe="\$(git describe --always --tags)" \
+                       --build-arg image_git_describe="\$(git describe --always --tags --match 20*)" \
                        --build-arg image_git_describe_submodules="\$(git submodule | xargs)" \
                        --build-arg image_tag=\$DOCKER_TAG \
                        --build-arg image_uuidgen=\$(uuidgen) \
