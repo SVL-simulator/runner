@@ -1,11 +1,11 @@
 
-COMPOSE_PROJECT_NAME=scenario_runner
+COMPOSE_PROJECT_NAME=vse_runner
 export COMPOSE_PROJECT_NAME
 
-COMPOSE:=docker-compose -f docker/docker-compose-dev.yml
+COMPOSE:=docker-compose -f docker/docker-compose-dev.vse.yml
 
 
-SCENARIO_RUNNER_IMAGE:=scenario_runner_devenv:latest
+SCENARIO_RUNNER_IMAGE:=vse_runner_devenv:latest
 export SCENARIO_RUNNER_IMAGE
 
 BUILD_REF:="devenv-$(shell git describe --always --tag)"
@@ -30,12 +30,12 @@ else
 RUNNER_BASE_TAG:=latest
 # Use the defaults specified in docker/Dockerfile for PYTHON_VERSION_MAJOR_MINOR, PYTHON_VERSION_PATCH, and REQUIREMENTS_TXT.
 # However, the latter is needed in this file, so extract its default from there.
-REQUIREMENTS_TXT:=$(shell awk 'toupper($$1) == "ARG" && $$2 ~ /^REQUIREMENTS_TXT=/ { print gensub(/^REQUIREMENTS_TXT=/, "", 1, $$2); exit }' docker/Dockerfile)
+REQUIREMENTS_TXT:=$(shell awk 'toupper($$1) == "ARG" && $$2 ~ /^REQUIREMENTS_TXT=/ { print gensub(/^REQUIREMENTS_TXT=/, "", 1, $$2); exit }' docker/Dockerfile.vse)
 endif
 
 build-base:
-	docker build $(DOCKER_BUILD_OPTS) -f docker/Dockerfile \
-		-t local/scenario_runner_base:$(RUNNER_BASE_TAG) \
+	docker build $(DOCKER_BUILD_OPTS) -f docker/Dockerfile.vse \
+		-t local/vse_runner_base:$(RUNNER_BASE_TAG) \
 		$(BUILD_ARG__PYTHON_VERSION_MAJOR_MINOR) \
 		$(BUILD_ARG__PYTHON_VERSION_PATCH) \
 		$(BUILD_ARG__REQUIREMENTS_TXT) \
@@ -43,34 +43,34 @@ build-base:
 
 upgrade-base-dependencies:
 	touch $(REQUIREMENTS_TXT)
-	docker build --pull --no-cache -f docker/Dockerfile \
+	docker build --pull --no-cache -f docker/Dockerfile.vse \
 		--target builder \
-		-t local/scenario_runner_base_requirements \
+		-t local/vse_runner_base_requirements \
 		$(BUILD_ARG__PYTHON_VERSION_MAJOR_MINOR) \
 		$(BUILD_ARG__PYTHON_VERSION_PATCH) \
 		$(BUILD_ARG__REQUIREMENTS_TXT) \
 		--build-arg GENERATE_REQUIREMENTS_TXT=true \
 		.
 	# Don't include the packages that we build.
-	docker run --rm local/scenario_runner_base_requirements python3 -m pip freeze | grep -v '@ file://' > $(REQUIREMENTS_TXT)
-	docker image rm local/scenario_runner_base_requirements
+	docker run --rm local/vse_runner_base_requirements python3 -m pip freeze | grep -v '@ file://' > $(REQUIREMENTS_TXT)
+	docker image rm local/vse_runner_base_requirements
 
 build-devenv: build-base
-	docker build $(DOCKER_BUILD_OPTS) -f docker/Dockerfile.devenv --build-arg BASE_IMAGE=local/scenario_runner_base -t local/scenario_runner_devenv .
+	docker build $(DOCKER_BUILD_OPTS) -f docker/Dockerfile.devenv --build-arg BASE_IMAGE=local/vse_runner_base -t local/vse_runner_devenv .
 
 build: compose-build list-devenv-images
 
 compose-build:
 	${COMPOSE} build
-	docker tag scenario-runner:latest auto-gitlab.lgsvl.net:4567/hdrp/scenarios/runner:dev
+	docker tag vse-runner:latest auto-gitlab.lgsvl.net:4567/hdrp/scenarios/runner/vse:dev
 
 list-devenv-images:
-	@docker images | grep -E "^REPOSITORY|^${COMPOSE_PROJECT_NAME}|hdrp/scenarios/runner|^scenario-runner"
+	@docker images | grep -E "^REPOSITORY|^${COMPOSE_PROJECT_NAME}|hdrp/scenarios/runner|^vse-runner"
 
 
 docker-latest-rel:
-	docker tag scenario-runner:latest lgsvl/simulator-scenarios-runner:latest
-	docker images | grep -E 'scenario_runner' | sort
+	docker tag vse-runner:latest lgsvl/simulator-scenarios-vse-runner:latest
+	docker images | grep -E 'vse_runner' | sort
 
 shell:
 	./scripts/scenario_runner.sh
@@ -88,10 +88,10 @@ cleanup:
 	${COMPOSE} rm
 
 flake8:
-	${COMPOSE} run --rm devenv flake8 runner
+	${COMPOSE} run --rm devenv flake8 vse-runner
 
 test:
-	${COMPOSE} run --rm devenv pytest -s -v runner/tests
+	${COMPOSE} run --rm devenv pytest -s -v vse-runner/tests
 
 submodules-pull-master:
 	git submodule init
@@ -108,13 +108,13 @@ version:
 	./scripts/scenario_runner.sh version
 
 bundles-fast:
-	export FAST_RELEASE=1 && ./ci/make_bundle.sh latest auto-gitlab.lgsvl.net:4567/hdrp/scenarios/runner
+	export FAST_RELEASE=1 && ./ci/make_bundle.sh latest auto-gitlab.lgsvl.net:4567/hdrp/scenarios/runner/vse
 	cd dist/lgsvlsimulator-scenarios-latest && ../../tests/check-bundle-content.sh
 
 bundles:
-	docker tag scenario-runner:latest auto-gitlab.lgsvl.net:4567/hdrp/scenarios/runner:latest
-	# docker pull auto-gitlab.lgsvl.net:4567/hdrp/scenarios/runner:latest
-	./ci/make_bundle.sh latest auto-gitlab.lgsvl.net:4567/hdrp/scenarios/runner
+	docker tag vse-runner:latest auto-gitlab.lgsvl.net:4567/hdrp/scenarios/runner/vse:latest
+	# docker pull auto-gitlab.lgsvl.net:4567/hdrp/scenarios/runner/vse:latest
+	./ci/make_bundle.sh latest auto-gitlab.lgsvl.net:4567/hdrp/scenarios/runner/vse
 
 SIMULATOR_DIR?=/home/user/path/to/simulator
 

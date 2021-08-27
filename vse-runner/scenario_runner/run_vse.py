@@ -44,7 +44,7 @@ class VSERunner:
     def connect_bridge(self, ego_agent, ego_index=0, default_host="127.0.0.1", default_port=9090):
         autopilot_host_env = "LGSVL__AUTOPILOT_{}_HOST".format(ego_index)
         autopilot_port_env = "LGSVL__AUTOPILOT_{}_PORT".format(ego_index)
-        if  autopilot_host_env not in os.environ:
+        if autopilot_host_env not in os.environ:
             raise RuntimeWarning("Environment variable {} is absent or empty.".format(autopilot_host_env))
 
         bridge_host = os.environ.get(autopilot_host_env, default_host)
@@ -96,8 +96,8 @@ class VSERunner:
             return
 
         controllables_data = self.VSE_dict["controllables"]
-        for controllable_data in controllables_data:	
-            #Name checking for backwards compability
+        for controllable_data in controllables_data:
+            # Name checking for backwards compability
             spawned = "name" in controllable_data or ("spawned" in controllables_data and controllable_data["spawned"])
             if spawned:
                 log.debug("Adding controllable {}".format(controllable_data["name"]))
@@ -109,7 +109,10 @@ class VSERunner:
                     if len(policy) > 0:
                         controllable.control(policy)
                 except Exception as e:
-                    msg = "Failed to add controllable {}, please make sure you have the correct simulator".format(controllable_data["name"])
+                    msg = "Failed to add controllable {}, please make sure you have the correct simulator".format(
+                        controllable_data["name"]
+                    )
+
                     log.error(msg)
                     log.error("Original exception: " + str(e))
             else:
@@ -119,7 +122,7 @@ class VSERunner:
                 policy = controllable_data["policy"]
                 if len(policy) > 0:
                     controllable.control(policy)
-                
+
     def add_ego(self):
         for i, agent in enumerate(self.ego_agents):
             if "id" in agent:
@@ -135,7 +138,7 @@ class VSERunner:
                     agent["destinationPoint"]["position"]["z"]
                 )
                 #
-                # Set distination rotation once it is supported by DreamView
+                # Set destination rotation once it is supported by DreamView
                 #
                 agent_destination_rotation = lgsvl.Vector(
                     agent["destinationPoint"]["rotation"]["x"],
@@ -170,9 +173,9 @@ class VSERunner:
                 ]
 
                 if agent.get("sensorsConfigurationId") in {
-                        lgsvl.wise.DefaultAssets.ego_lincoln2017mkz_apollo5_modular,
-                        lgsvl.wise.DefaultAssets.ego_lincoln2017mkz_apollo6_modular,
-                    }:
+                    lgsvl.wise.DefaultAssets.ego_lincoln2017mkz_apollo5_modular,
+                    lgsvl.wise.DefaultAssets.ego_lincoln2017mkz_apollo6_modular,
+                }:
                     default_modules = [
                         'Localization',
                         'Transform',
@@ -222,7 +225,11 @@ class VSERunner:
                 agent_name = agent["variant"]
             agent_state = lgsvl.AgentState()
             agent_state.transform = self.read_transform(agent["transform"])
-            agent_color = lgsvl.Vector(agent["color"]["r"], agent["color"]["g"], agent["color"]["b"]) if "color" in agent else None
+            agent_color = (
+                lgsvl.Vector(agent["color"]["r"], agent["color"]["g"], agent["color"]["b"])
+                if "color" in agent
+                else None
+            )
 
             try:
                 npc = self.sim.add_agent(agent_name, lgsvl.AgentType.NPC, agent_state, agent_color)
@@ -304,7 +311,14 @@ class VSERunner:
             else:
                 wait_time = waypoint_data["waitTime"]
             trigger = self.read_trigger(waypoint_data)
-            waypoint = lgsvl.DriveWaypoint(position, speed, acceleration=acceleration, angle=angle, idle=wait_time, trigger=trigger)
+            waypoint = lgsvl.DriveWaypoint(
+                position,
+                speed,
+                acceleration=acceleration,
+                angle=angle,
+                idle=wait_time,
+                trigger=trigger,
+            )
             waypoints.append(waypoint)
 
         return waypoints

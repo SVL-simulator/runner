@@ -43,11 +43,11 @@ def get_version(git_tag):
     periods (except the first, which is dropped). This segment will be empty if:
     - Git is not available, or
     - the working tree is not a Git repository, or
-    - the tag <git_tag> is not present or not on the currrent branch, or
+    - the tag <git_tag> is not present or not on the current branch, or
     - the HEAD of the current branch is coincident with the tag <git_tag>.
     The second segment is value of the SCENARIO_RUNNER__BUILD_KIND environment
     variable, unless the value is 'official', in which case this segment is
-    empty. If SCENARIO_RUNNER__BUILD_KIND is not in the enviroment, 'dev' is
+    empty. If SCENARIO_RUNNER__BUILD_KIND is not in the environment, 'dev' is
     used for this segment.
 
     NB. - Not using https://pypi.org/project/setuptools-git-version/ because it
@@ -87,9 +87,9 @@ def get_version(git_tag):
 
 
 setup(
-    name="scenario_runner",
+    name="vse_runner",
     version=get_version('2021.1'),
-    description="Scenario Runner for SVL Simulator",
+    description="Visual Scenario Editor Runner for SVL Simulator",
     author="LGSVL",
     author_email="contact@svlsimulator.com",
     python_requires=">=3.6.0",

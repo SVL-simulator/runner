@@ -1,0 +1,51 @@
+version: "3.3"
+services:
+    base:
+        build:
+            context: ..
+            dockerfile: docker/Dockerfile.python
+            labels:
+                com.lgsvlsimulator.python_api_runner.build_ref: ${BUILD_REF}
+        image: python-api-runner
+        network_mode: host
+
+    devenv:
+        build:
+            context: ..
+            dockerfile: docker/Dockerfile.devenv
+            args:
+                BASE_IMAGE: python-api-runner
+
+        working_dir: /src
+        network_mode: host
+        volumes:
+            - ..:/src:ro
+        environment:
+            - debian_chroot=DEVENV
+            - SIMULATOR_HOST
+            - SIMULATOR_PORT
+            - BRIDGE_HOST
+            - BRIDGE_PORT
+            - LGSVL__AUTOPILOT_0_HOST
+            - LGSVL__AUTOPILOT_0_PORT
+            - LGSVL__AUTOPILOT_0_VEHICLE_CONFIG
+            - LGSVL__AUTOPILOT_0_VEHICLE_MODULES
+            - LGSVL__AUTOPILOT_HD_MAP
+            - LGSVL__DATE_TIME
+            - LGSVL__ENVIRONMENT_CLOUDINESS
+            - LGSVL__ENVIRONMENT_DAMAGE
+            - LGSVL__ENVIRONMENT_FOG
+            - LGSVL__ENVIRONMENT_RAIN
+            - LGSVL__ENVIRONMENT_WETNESS
+            - LGSVL__MAP
+            - LGSVL__RANDOM_SEED
+            - LGSVL__SIMULATION_DURATION_SECS
+            - LGSVL__SIMULATOR_HOST
+            - LGSVL__SIMULATOR_PORT
+            - LGSVL__SPAWN_BICYCLES
+            - LGSVL__SPAWN_PEDESTRIANS
+            - LGSVL__SPAWN_TRAFFIC
+            - LGSVL__TIME_OF_DAY
+            - LGSVL__TIME_STATIC
+            - LGSVL__VEHICLE_0
+            - "PYTHONPATH=/src/runner:/src/externals/PythonApi"

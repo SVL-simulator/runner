@@ -3,10 +3,10 @@ services:
     base:
         build:
             context: ..
-            dockerfile: docker/Dockerfile
+            dockerfile: docker/Dockerfile.vse
             labels:
-                com.lgsvlsimulator.scenarios_runner.build_ref: ${BUILD_REF}
-        image: scenario-runner
+                com.lgsvlsimulator.vse_runner.build_ref: ${BUILD_REF}
+        image: vse-runner
         network_mode: host
 
     devenv:
@@ -14,7 +14,7 @@ services:
             context: ..
             dockerfile: docker/Dockerfile.devenv
             args:
-                BASE_IMAGE: scenario-runner
+                BASE_IMAGE: vse-runner
 
         working_dir: /src
         network_mode: host
