@@ -3,10 +3,10 @@ services:
     base:
         build:
             context: ..
-            dockerfile: docker/Dockerfile.python-api
+            dockerfile: docker/Dockerfile.random-traffic
             labels:
-                com.lgsvlsimulator.python_api_runner.build_ref: ${BUILD_REF}
-        image: python-api-runner
+                com.lgsvlsimulator.random_traffic_runner.build_ref: ${BUILD_REF}
+        image: random-traffic-runner
         network_mode: host
 
     devenv:
@@ -14,7 +14,7 @@ services:
             context: ..
             dockerfile: docker/Dockerfile.devenv
             args:
-                BASE_IMAGE: python-api-runner
+                BASE_IMAGE: random-traffic-runner
 
         working_dir: /src
         network_mode: host
