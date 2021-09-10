@@ -65,6 +65,16 @@ class VSERunner:
         else:
             self.sim.load(scene)
 
+        if "navData" in self.VSE_dict.keys():
+            nav_origins = self.VSE_dict["navData"]["navOrigins"]
+            for nav_origin in nav_origins:
+                transform = lgsvl.Transform.from_json(nav_origin["transform"])
+                origin_x = nav_origin["parameters"]["originX"]
+                origin_y = nav_origin["parameters"]["originY"]
+                rotation_param = nav_origin["parameters"]["rotation"]
+                parameters = lgsvl.Vector(origin_x, origin_y, rotation_param)
+                self.sim.set_nav_origin(transform, parameters)
+
     def load_agents(self):
         if "agents" not in self.VSE_dict.keys():
             log.warning("No agents specified in the scenario")
@@ -159,6 +169,12 @@ class VSERunner:
 
             try:
                 bridge_host = self.connect_bridge(ego, i)[0]
+
+                if "destinationPoint" in agent:
+                    ego.set_initial_pose()
+                    self.sim.run(5)  # Run simulation for a short time for Nav2 stack to localize EGO before sending destination
+                    destination = lgsvl.Transform(agent_destination, agent_destination_rotation)
+                    ego.set_destination(destination)
 
                 default_modules = [
                     'Localization',
