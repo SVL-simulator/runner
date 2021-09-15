@@ -107,31 +107,10 @@ inspect-labels:
 version:
 	./scripts/scenario_runner.sh version
 
-bundles-fast:
-	export FAST_RELEASE=1 && ./ci/make_bundle.sh latest auto-gitlab.lgsvl.net:4567/hdrp/scenarios/runner/vse
-	cd dist/lgsvlsimulator-scenarios-latest && ../../tests/check-bundle-content.sh
-
-bundles:
-	docker tag vse-runner:latest auto-gitlab.lgsvl.net:4567/hdrp/scenarios/runner/vse:latest
-	# docker pull auto-gitlab.lgsvl.net:4567/hdrp/scenarios/runner/vse:latest
-	./ci/make_bundle.sh latest auto-gitlab.lgsvl.net:4567/hdrp/scenarios/runner/vse
-
 SIMULATOR_DIR?=/home/user/path/to/simulator
 
 .check_simulator_dir:
 	@test -d ${SIMULATOR_DIR} || (echo "E: Can't locate simulator dir at ${SIMULATOR_DIR}. Make sure SIMULATOR_DIR env var points to correct path"; exit 1)
-
-install-runtime-dist: .check_simulator_dir
-	./dist/lgsvlsimulator-scenarios-latest/install-testcase-runtime.sh ${SIMULATOR_DIR}
-	tree ${SIMULATOR_DIR}/TestCaseRunner
-
-install-runtime-dev: .check_simulator_dir
-	./scripts/install-testcase-runtime.sh ${SIMULATOR_DIR}
-	tree ${SIMULATOR_DIR}/TestCaseRunner
-
-install-runtime-dist-copy: .check_simulator_dir
-	./dist/lgsvlsimulator-scenarios-latest/install-testcase-runtime.sh ${SIMULATOR_DIR} copy
-	tree ${SIMULATOR_DIR}/TestCaseRunner
 
 push-ci-trybyild:
 	git push origin -f  HEAD:ci-master && git push origin -f && git tag -f CI-TAG && git push origin -f CI-TAG
