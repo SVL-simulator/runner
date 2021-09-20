@@ -260,16 +260,19 @@ class VSERunner:
             if agent["behaviour"]["name"] == "NPCWaypointBehaviour":
                 waypoints = self.read_waypoints(agent["waypoints"])
                 if waypoints:
-                    if "waypoints_loop" in agent:
-                        if "waypoints_path_type" in agent:
-                            npc.follow(waypoints, agent["waypoints_loop"], agent["waypoints_path_type"])
-                        else:
-                            npc.follow(waypoints, agent["waypoints_loop"])
+                    loop = False
+                    if "waypointsLoop" in agent:
+                        loop = agent["waypointsLoop"]
+                    else:
+                        if "waypoints_loop" in agent:
+                            loop = agent["waypoints_loop"]
+                    path_type = "Linear"
+                    if "waypointsPathType" in agent:
+                        path_type = agent["waypointsPathType"]
                     else:
                         if "waypoints_path_type" in agent:
-                            npc.follow(waypoints, False, agent["waypoints_path_type"])
-                        else:
-                            npc.follow(waypoints)
+                            path_type = agent["waypoints_path_type"]
+                    npc.follow(waypoints, loop, path_type)
             elif agent["behaviour"]["name"] == "NPCLaneFollowBehaviour":
                 npc.follow_closest_lane(
                     True,
