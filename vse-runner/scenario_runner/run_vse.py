@@ -58,7 +58,7 @@ class VSERunner:
             log.error("No map specified in the scenario.")
             sys.exit(1)
 
-        scene = self.VSE_dict["map"]["name"]
+        scene = self.VSE_dict["map"]["id"]
         log.info("Loading {} map.".format(scene))
         if self.sim.current_scene == scene:
             self.sim.reset()
