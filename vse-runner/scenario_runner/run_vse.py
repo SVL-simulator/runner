@@ -167,63 +167,65 @@ class VSERunner:
                 log.error("Original exception: " + str(e))
                 sys.exit(1)
 
+            log.info(ego.get_bridge_type())
             try:
                 bridge_host = self.connect_bridge(ego, i)[0]
-
-                if "destinationPoint" in agent:
-                    ego.set_initial_pose()
-                    self.sim.run(5)  # Run simulation for a short time for Nav2 stack to localize EGO before sending destination
-                    destination = lgsvl.Transform(agent_destination, agent_destination_rotation)
-                    ego.set_destination(destination)
-
-                default_modules = [
-                    'Localization',
-                    'Perception',
-                    'Transform',
-                    'Routing',
-                    'Prediction',
-                    'Planning',
-                    'Traffic Light',
-                    'Control',
-                    'Recorder'
-                ]
-
-                if agent.get("sensorsConfigurationId") in {
-                    lgsvl.wise.DefaultAssets.ego_lincoln2017mkz_apollo5_modular,
-                    lgsvl.wise.DefaultAssets.ego_lincoln2017mkz_apollo6_modular,
-                }:
+                if ego.get_bridge_type() == "CyberRT":
                     default_modules = [
                         'Localization',
+                        'Perception',
                         'Transform',
                         'Routing',
                         'Prediction',
                         'Planning',
+                        'Traffic Light',
                         'Control',
                         'Recorder'
                     ]
 
-                try:
-                    modules = os.environ.get("LGSVL__AUTOPILOT_{}_VEHICLE_MODULES".format(i)).split(",")
-                    if len(modules) == 0:
+                    if agent.get("sensorsConfigurationId") in {
+                        lgsvl.wise.DefaultAssets.ego_lincoln2017mkz_apollo5_modular,
+                        lgsvl.wise.DefaultAssets.ego_lincoln2017mkz_apollo6_modular,
+                    }:
+                        default_modules = [
+                            'Localization',
+                            'Transform',
+                            'Routing',
+                            'Prediction',
+                            'Planning',
+                            'Control',
+                            'Recorder'
+                        ]
+
+                    try:
+                        modules = os.environ.get("LGSVL__AUTOPILOT_{}_VEHICLE_MODULES".format(i)).split(",")
+                        if len(modules) == 0:
+                            modules = default_modules
+                    except Exception:
                         modules = default_modules
-                except Exception:
-                    modules = default_modules
-                dv = lgsvl.dreamview.Connection(self.sim, ego, bridge_host)
+                    dv = lgsvl.dreamview.Connection(self.sim, ego, bridge_host)
 
-                hd_map = os.environ.get("LGSVL__AUTOPILOT_HD_MAP")
-                if not hd_map:
-                    hd_map = self.sim.current_scene
-                    words = self.split_pascal_case(hd_map)
-                    hd_map = ' '.join(words)
+                    hd_map = os.environ.get("LGSVL__AUTOPILOT_HD_MAP")
+                    if not hd_map:
+                        hd_map = self.sim.current_scene
+                        words = self.split_pascal_case(hd_map)
+                        hd_map = ' '.join(words)
 
-                dv.set_hd_map(hd_map)
-                dv.set_vehicle(os.environ.get("LGSVL__AUTOPILOT_{}_VEHICLE_CONFIG".format(i), agent["variant"]))
-                if "destinationPoint" in agent:
-                    dv.setup_apollo(agent_destination.x, agent_destination.z, modules)
+                    dv.set_hd_map(hd_map)
+                    dv.set_vehicle(os.environ.get("LGSVL__AUTOPILOT_{}_VEHICLE_CONFIG".format(i), agent["variant"]))
+                    if "destinationPoint" in agent:
+                        dv.setup_apollo(agent_destination.x, agent_destination.z, modules)
+                    else:
+                        log.info("No destination set for EGO {}".format(agent_name))
+                        for mod in modules:
+                            dv.enable_module(mod)
                 else:
-                    log.info("No destination set for EGO {}".format(agent_name))
-                    for mod in modules:
-                        dv.enable_module(mod)
+                    if "destinationPoint" in agent:
+                        ego.set_initial_pose()
+                        self.sim.run(5)  # Run simulation for a short time for Nav2 stack to localize EGO before sending destination
+                        destination = lgsvl.Transform(agent_destination, agent_destination_rotation)
+                        ego.set_destination(destination)
+
             except RuntimeWarning as e:
                 msg = "Skipping bridge connection for vehicle: {}".format(agent["id"])
                 log.warning("Original exception: " + str(e))
