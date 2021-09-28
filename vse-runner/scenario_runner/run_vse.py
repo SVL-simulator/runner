@@ -167,7 +167,7 @@ class VSERunner:
                 log.error("Original exception: " + str(e))
                 sys.exit(1)
 
-            log.info(ego.get_bridge_type())
+            log.info("Ego agent detected bridge type: {}".format(ego.get_bridge_type()))
             try:
                 bridge_host = self.connect_bridge(ego, i)[0]
                 if ego.get_bridge_type() == "CyberRT":
@@ -207,9 +207,10 @@ class VSERunner:
 
                     hd_map = os.environ.get("LGSVL__AUTOPILOT_HD_MAP")
                     if not hd_map:
-                        hd_map = self.sim.current_scene
+                        hd_map = self.VSE_dict["map"]["name"]
                         words = self.split_pascal_case(hd_map)
                         hd_map = ' '.join(words)
+                        log.info("LGSVL__AUTOPILOT_HD_MAP environment variable absent. Using '{}' instead.".format(hd_map))
 
                     dv.set_hd_map(hd_map)
                     dv.set_vehicle(os.environ.get("LGSVL__AUTOPILOT_{}_VEHICLE_CONFIG".format(i), agent["variant"]))
