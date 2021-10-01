@@ -207,7 +207,8 @@ pipeline {
                               \$DOCKER_REGISTRY/\$ECR_REPO_PYTHON_API\$DOCKER_REPO_SUFFIX:version__${env.GIT_TAG_FOR_DOCKER}_${JENKINS_BUILD_ID}
                   docker push \$DOCKER_REGISTRY/\$ECR_REPO_PYTHON_API\$DOCKER_REPO_SUFFIX:version__${env.GIT_TAG_FOR_DOCKER}_${JENKINS_BUILD_ID}
                   docker image rm \$DOCKER_REGISTRY/\$ECR_REPO_PYTHON_API\$DOCKER_REPO_SUFFIX:version__${env.GIT_TAG_FOR_DOCKER}_${JENKINS_BUILD_ID}
-              elif [ "${BRANCH_NAME}" = "master" ] ; then
+              fi
+              if [ "${BRANCH_NAME}" = "master" ] ; then
                   docker tag ${GITLAB_HOST}:4567/${GITLAB_REPO_PYTHON_API}\$DOCKER_REPO_SUFFIX:\$DOCKER_TAG \
                              \$DOCKER_REGISTRY/\$ECR_REPO_PYTHON_API\$DOCKER_REPO_SUFFIX:latest
                   docker push \$DOCKER_REGISTRY/\$ECR_REPO_PYTHON_API\$DOCKER_REPO_SUFFIX:latest
@@ -229,7 +230,8 @@ pipeline {
                               \$DOCKER_REGISTRY/\$ECR_REPO_VSE\$DOCKER_REPO_SUFFIX:version__${env.GIT_TAG_FOR_DOCKER}_${JENKINS_BUILD_ID}
                   docker push \$DOCKER_REGISTRY/\$ECR_REPO_VSE\$DOCKER_REPO_SUFFIX:version__${env.GIT_TAG_FOR_DOCKER}_${JENKINS_BUILD_ID}
                   docker image rm \$DOCKER_REGISTRY/\$ECR_REPO_VSE\$DOCKER_REPO_SUFFIX:version__${env.GIT_TAG_FOR_DOCKER}_${JENKINS_BUILD_ID}
-              elif [ "${BRANCH_NAME}" = "master" ] ; then
+              fi
+              if [ "${BRANCH_NAME}" = "master" ] ; then
                   docker tag ${GITLAB_HOST}:4567/${GITLAB_REPO_VSE}\$DOCKER_REPO_SUFFIX:\$DOCKER_TAG \
                              \$DOCKER_REGISTRY/\$ECR_REPO_VSE\$DOCKER_REPO_SUFFIX:latest
                   docker push \$DOCKER_REGISTRY/\$ECR_REPO_VSE\$DOCKER_REPO_SUFFIX:latest
