@@ -167,8 +167,8 @@ class VSERunner:
                 log.error("Original exception: " + str(e))
                 sys.exit(1)
 
-            log.info("Ego agent detected bridge type: {}".format(ego.get_bridge_type()))
             try:
+                log.info("Ego agent detected bridge type: {}".format(ego.get_bridge_type()))
                 bridge_host = self.connect_bridge(ego, i)[0]
                 if ego.get_bridge_type() == "CyberRT":
                     default_modules = [
@@ -235,6 +235,11 @@ class VSERunner:
                 msg = "Something went wrong with bridge / dreamview connection."
                 log.error("Original exception: " + str(e))
                 log.error(msg)
+
+            # Set waypoints for the ego vehicle if waypoints are set in the scenario
+            if "waypoints" in agent:
+                waypoints = self.read_waypoints(agent["waypoints"])
+                ego.follow(waypoints, agent["waypointsLoop"], agent["waypointsPathType"])
 
     def add_npc(self):
         for agent in self.npc_agents:
@@ -330,8 +335,10 @@ class VSERunner:
             angle = lgsvl.Vector.from_json(waypoint_data["angle"])
             if "wait_time" in waypoint_data:
                 wait_time = waypoint_data["wait_time"]
-            else:
+            elif "waitTime" in waypoint_data:
                 wait_time = waypoint_data["waitTime"]
+            else:
+                wait_time = 0
             trigger = self.read_trigger(waypoint_data)
             waypoint = lgsvl.DriveWaypoint(
                 position,
