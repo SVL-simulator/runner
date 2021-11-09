@@ -54,7 +54,7 @@ ARG image_tag=(unset)
 ARG image_uuidgen=(unset)
 
 RUN set -ex \
-  && echo "IMAGE_APP=scenarios/runner/vse\n\
+  && echo "IMAGE_APP=runner/vse\n\
 IMAGE_CREATED_BY=auto-jenkins\n\
 IMAGE_CREATED_FROM=${image_git_describe}\n\
 IMAGE_CREATED_FROM_SUBMODULES='${image_git_describe_submodules}'\n\
