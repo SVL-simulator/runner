@@ -239,7 +239,8 @@ class VSERunner:
             # Set waypoints for the ego vehicle if waypoints are set in the scenario
             if "waypoints" in agent:
                 waypoints = self.read_waypoints(agent["waypoints"])
-                ego.follow(waypoints, agent["waypointsLoop"], agent["waypointsPathType"])
+                if waypoints:
+                    ego.follow(waypoints, agent["waypointsLoop"], agent["waypointsPathType"])
 
     def add_npc(self):
         for agent in self.npc_agents:
@@ -279,6 +280,7 @@ class VSERunner:
                         if "waypoints_path_type" in agent:
                             path_type = agent["waypoints_path_type"]
                     npc.follow(waypoints, loop, path_type)
+
             elif agent["behaviour"]["name"] == "NPCLaneFollowBehaviour":
                 npc.follow_closest_lane(
                     True,
@@ -305,14 +307,14 @@ class VSERunner:
 
             waypoints = self.read_waypoints(agent["waypoints"])
             if waypoints:
-                if "waypoints_loop" in agent:
-                    if "waypoints_path_type" in agent:
-                        pedestrian.follow(waypoints, agent["waypoints_loop"], agent["waypoints_path_type"])
+                if "waypointsLoop" in agent:
+                    if "waypointsPathType" in agent:
+                        pedestrian.follow(waypoints, agent["waypointsLoop"], agent["waypointsPathType"])
                     else:
-                        pedestrian.follow(waypoints, agent["waypoints_loop"])
+                        pedestrian.follow(waypoints, agent["waypointsLoop"])
                 else:
-                    if "waypoints_path_type" in agent:
-                        pedestrian.follow(waypoints, False, agent["waypoints_path_type"])
+                    if "waypointsPathType" in agent:
+                        pedestrian.follow(waypoints, False, agent["waypointsPathType"])
                     else:
                         pedestrian.follow(waypoints)
 
