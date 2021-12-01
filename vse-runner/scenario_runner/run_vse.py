@@ -114,7 +114,8 @@ class VSERunner:
                 controllable_state = lgsvl.ObjectState()
                 controllable_state.transform = self.read_transform(controllable_data["transform"])
                 try:
-                    controllable = self.sim.controllable_add(controllable_data["name"], controllable_state)
+                    controllable = self.sim.controllable_add(controllable_data["name"], controllable_state,
+                                                             uid=controllable_data["uid"])
                     policy = controllable_data["policy"]
                     if len(policy) > 0:
                         controllable.control(policy)
@@ -158,9 +159,10 @@ class VSERunner:
 
             try:
                 if "sensorsConfigurationId" in agent:
-                    ego = self.sim.add_agent(agent["sensorsConfigurationId"], lgsvl.AgentType.EGO, agent_state)
+                    ego = self.sim.add_agent(
+                        agent["sensorsConfigurationId"], lgsvl.AgentType.EGO, agent_state, uid=agent["uid"])
                 else:
-                    ego = self.sim.add_agent(agent_name, lgsvl.AgentType.EGO, agent_state)
+                    ego = self.sim.add_agent(agent_name, lgsvl.AgentType.EGO, agent_state, uid=agent["uid"])
             except Exception as e:
                 msg = "Failed to add agent {}, please make sure you have the correct simulator".format(agent_name)
                 log.error(msg)
@@ -257,7 +259,7 @@ class VSERunner:
             )
 
             try:
-                npc = self.sim.add_agent(agent_name, lgsvl.AgentType.NPC, agent_state, agent_color)
+                npc = self.sim.add_agent(agent_name, lgsvl.AgentType.NPC, agent_state, agent_color, uid=agent["uid"])
             except Exception as e:
                 msg = "Failed to add agent {}, please make sure you have the correct simulator".format(agent_name)
                 log.error(msg)
@@ -298,7 +300,7 @@ class VSERunner:
             agent_state.transform = self.read_transform(agent["transform"])
 
             try:
-                pedestrian = self.sim.add_agent(agent_name, lgsvl.AgentType.PEDESTRIAN, agent_state)
+                pedestrian = self.sim.add_agent(agent_name, lgsvl.AgentType.PEDESTRIAN, agent_state, uid=agent["uid"])
             except Exception as e:
                 msg = "Failed to add agent {}, please make sure you have the correct simulator".format(agent_name)
                 log.error(msg)
