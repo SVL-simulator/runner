@@ -1,0 +1,32 @@
+version: "3.3"
+services:
+    base:
+        build:
+            context: ..
+            dockerfile: docker/Dockerfile.autoware-auto-odd
+            labels:
+                com.lgsvlsimulator.awf_scenario_runner.build_ref: ${BUILD_REF}
+        image: autoware-auto-odd-runner
+        network_mode: host
+
+    devenv:
+        build:
+            context: ..
+            dockerfile: docker/Dockerfile.devenv
+            args:
+                BASE_IMAGE: autoware-auto-odd-runner
+
+        working_dir: /src
+        network_mode: host
+        volumes:
+            - ..:/src:ro
+        environment:
+            - debian_chroot=DEVENV
+            - "PYTHONPATH=/src/runner:/src/externals/PythonApi"
+            # Default simulator host/port
+            - "LGSVL__SIMULATOR_HOST=127.0.0.1"
+            - "LGSVL__SIMULATOR_PORT=8181"
+            # Shalun map
+            - "LGSVL__MAP=97128028-33c7-4411-b1ec-d693ed35071f"
+            # Lexus with AutowareAuto sensor config
+            - "LGSVL__VEHICLE_0=12d47257-a929-4077-827f-a94a42830cfd"

@@ -1,0 +1,679 @@
+ScenarioModifiers:
+  ScenarioModifier:
+    - name: __tier4_modifier_dummy
+      start: 0
+      step: 0
+      stop: 0
+OpenSCENARIO:
+  FileHeader:
+    revMajor: 1
+    revMinor: 0
+    date: '2021-10-22T12:56:30.272Z'
+    description: ''
+    author: ''
+  ParameterDeclarations:
+    ParameterDeclaration:
+      - name: dummy
+        parameterType: double
+        value: __tier4_modifier_dummy
+  CatalogLocations:
+    CatalogLocation: []
+  RoadNetwork:
+    LogicFile:
+      filepath: /home/vhavrylov/Projects/Maps/Shalun.osm
+    SceneGraphFile:
+      filepath: Shalun.pcd
+    TrafficSignals:
+      TrafficSignalController: []
+  Entities:
+    ScenarioObject:
+      - name: ego
+        Vehicle:
+          name: ''
+          vehicleCategory: car
+          BoundingBox:
+            Center:
+              x: 1.355
+              y: 0
+              z: 1.25
+            Dimensions:
+              width: 2.25
+              length: 4.77
+              height: 2.5
+          Performance:
+            maxSpeed: 50
+            maxAcceleration: INF
+            maxDeceleration: INF
+          Axles:
+            FrontAxle:
+              maxSteering: 0.5236
+              wheelDiameter: 0.78
+              trackWidth: 1.63
+              positionX: 1.385
+              positionZ: 0.39
+            RearAxle:
+              maxSteering: 0.5236
+              wheelDiameter: 0.78
+              trackWidth: 1.63
+              positionX: -1.355
+              positionZ: 0.39
+          Properties:
+            Property: []
+        ObjectController:
+          Controller:
+            name: ''
+            Properties:
+              Property:
+                - name: isEgo
+                  value: 'false'
+      - name: Npc2
+        Vehicle:
+          name: ''
+          vehicleCategory: car
+          BoundingBox:
+            Center:
+              x: -0.0
+              y: 0
+              z: 1.25
+            Dimensions:
+              width: 1.8
+              length: 4
+              height: 2.5
+          Performance:
+            maxSpeed: 50
+            maxAcceleration: INF
+            maxDeceleration: INF
+          Axles:
+            FrontAxle:
+              maxSteering: 0.5236
+              wheelDiameter: 0.6
+              trackWidth: 1.8
+              positionX: 2
+              positionZ: 0.3
+            RearAxle:
+              maxSteering: 0.5236
+              wheelDiameter: 0.6
+              trackWidth: 1.8
+              positionX: 0
+              positionZ: 0.3
+          Properties:
+            Property: []
+        ObjectController:
+          Controller:
+            name: ''
+            Properties:
+              Property: []
+      - name: Npc3
+        Vehicle:
+          name: ''
+          vehicleCategory: car
+          BoundingBox:
+            Center:
+              x: -0.0
+              y: 0
+              z: 1.25
+            Dimensions:
+              width: 1.8
+              length: 4
+              height: 2.5
+          Performance:
+            maxSpeed: 50
+            maxAcceleration: INF
+            maxDeceleration: INF
+          Axles:
+            FrontAxle:
+              maxSteering: 0.5236
+              wheelDiameter: 0.6
+              trackWidth: 1.8
+              positionX: 2
+              positionZ: 0.3
+            RearAxle:
+              maxSteering: 0.5236
+              wheelDiameter: 0.6
+              trackWidth: 1.8
+              positionX: 0
+              positionZ: 0.3
+          Properties:
+            Property: []
+        ObjectController:
+          Controller:
+            name: ''
+            Properties:
+              Property: []
+      - name: Npc4
+        Vehicle:
+          name: ''
+          vehicleCategory: car
+          BoundingBox:
+            Center:
+              x: -0.0
+              y: 0
+              z: 1.25
+            Dimensions:
+              width: 1.8
+              length: 4
+              height: 2.5
+          Performance:
+            maxSpeed: 50
+            maxAcceleration: INF
+            maxDeceleration: INF
+          Axles:
+            FrontAxle:
+              maxSteering: 0.5236
+              wheelDiameter: 0.6
+              trackWidth: 1.8
+              positionX: 2
+              positionZ: 0.3
+            RearAxle:
+              maxSteering: 0.5236
+              wheelDiameter: 0.6
+              trackWidth: 1.8
+              positionX: 0
+              positionZ: 0.3
+          Properties:
+            Property: []
+        ObjectController:
+          Controller:
+            name: ''
+            Properties:
+              Property: []
+      - name: Pedestrian0
+        Pedestrian:
+          name: Pedestrian
+          mass: 60
+          model: ''
+          pedestrianCategory: pedestrian
+          BoundingBox:
+            Center:
+              x: 0
+              y: 0
+              z: 1
+            Dimensions:
+              width: 0.8
+              length: 0.8
+              height: 2
+          Properties:
+            Property: []
+      - name: Pedestrian1
+        Pedestrian:
+          name: Pedestrian
+          mass: 60
+          model: ''
+          pedestrianCategory: pedestrian
+          BoundingBox:
+            Center:
+              x: 0
+              y: 0
+              z: 1
+            Dimensions:
+              width: 0.8
+              length: 0.8
+              height: 2
+          Properties:
+            Property: []
+      - name: Pedestrian2
+        Pedestrian:
+          name: Pedestrian
+          mass: 60
+          model: ''
+          pedestrianCategory: pedestrian
+          BoundingBox:
+            Center:
+              x: 0
+              y: 0
+              z: 1
+            Dimensions:
+              width: 0.8
+              length: 0.8
+              height: 2
+          Properties:
+            Property: []
+      - name: Pedestrian3
+        Pedestrian:
+          name: Pedestrian
+          mass: 60
+          model: ''
+          pedestrianCategory: pedestrian
+          BoundingBox:
+            Center:
+              x: 0
+              y: 0
+              z: 1
+            Dimensions:
+              width: 0.8
+              length: 0.8
+              height: 2
+          Properties:
+            Property: []
+      - name: Pedestrian4
+        Pedestrian:
+          name: Pedestrian
+          mass: 60
+          model: ''
+          pedestrianCategory: pedestrian
+          BoundingBox:
+            Center:
+              x: 0
+              y: 0
+              z: 1
+            Dimensions:
+              width: 0.8
+              length: 0.8
+              height: 2
+          Properties:
+            Property: []
+  Storyboard:
+    Init:
+      Actions:
+        Private:
+          - entityRef: ego
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ''
+                      laneId: '695'
+                      s: 0.0382
+                      offset: -0.1519
+                      Orientation:
+                        type: relative
+                        h: 0
+                        p: -0.0
+                        r: 0
+              - RoutingAction:
+                  AcquirePositionAction:
+                    Position:
+                      LanePosition:
+                        roadId: ''
+                        laneId: '649'
+                        s: 3.4021
+                        offset: 0.018
+                        Orientation:
+                          type: relative
+                          h: 0
+                          p: -0.0
+                          r: 0
+              - LongitudinalAction:
+                  SpeedAction:
+                    SpeedActionDynamics:
+                      dynamicsDimension: time
+                      value: 0
+                      dynamicsShape: step
+                    SpeedActionTarget:
+                      AbsoluteTargetSpeed:
+                        value: 5
+          - entityRef: Pedestrian0
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ''
+                      laneId: '3041'
+                      s: 0.2511
+                      offset: -0.3187
+                      Orientation:
+                        type: relative
+                        h: -0.0022
+                        p: 0
+                        r: 0
+              - LongitudinalAction:
+                  SpeedAction:
+                    SpeedActionDynamics:
+                      dynamicsDimension: time
+                      value: 0
+                      dynamicsShape: step
+                    SpeedActionTarget:
+                      AbsoluteTargetSpeed:
+                        value: 2
+          - entityRef: Pedestrian1
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ''
+                      laneId: '3027'
+                      s: 0
+                      offset: -0.4189
+                      Orientation:
+                        type: relative
+                        h: 0
+                        p: -0.0
+                        r: 0
+              - LongitudinalAction:
+                  SpeedAction:
+                    SpeedActionDynamics:
+                      dynamicsDimension: time
+                      value: 0
+                      dynamicsShape: step
+                    SpeedActionTarget:
+                      AbsoluteTargetSpeed:
+                        value: 1
+          - entityRef: Npc2
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ''
+                      laneId: '149'
+                      s: 21.9025
+                      offset: -0.1666
+                      Orientation:
+                        type: relative
+                        h: 0
+                        p: -0.0
+                        r: 0
+              - RoutingAction:
+                  AcquirePositionAction:
+                    Position:
+                      LanePosition:
+                        roadId: ''
+                        laneId: '293'
+                        s: 10.3884
+                        offset: -0.3485
+                        Orientation:
+                          type: relative
+                          h: 0
+                          p: -0.0
+                          r: 0
+              - LongitudinalAction:
+                  SpeedAction:
+                    SpeedActionDynamics:
+                      dynamicsDimension: time
+                      value: 0
+                      dynamicsShape: step
+                    SpeedActionTarget:
+                      AbsoluteTargetSpeed:
+                        value: 2
+          - entityRef: Npc3
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ''
+                      laneId: '461'
+                      s: 6.3061
+                      offset: 0.2057
+                      Orientation:
+                        type: relative
+                        h: 0
+                        p: -0.0
+                        r: 0
+              - RoutingAction:
+                  AcquirePositionAction:
+                    Position:
+                      LanePosition:
+                        roadId: ''
+                        laneId: '341'
+                        s: 4.8513
+                        offset: 0.1277
+                        Orientation:
+                          type: relative
+                          h: 0
+                          p: -0.0
+                          r: 0
+              - LongitudinalAction:
+                  SpeedAction:
+                    SpeedActionDynamics:
+                      dynamicsDimension: time
+                      value: 0
+                      dynamicsShape: step
+                    SpeedActionTarget:
+                      AbsoluteTargetSpeed:
+                        value: 5
+          - entityRef: Npc4
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ''
+                      laneId: '164'
+                      s: 3.3889
+                      offset: -0.0364
+                      Orientation:
+                        type: relative
+                        h: 0
+                        p: -0.0
+                        r: 0
+              - RoutingAction:
+                  AcquirePositionAction:
+                    Position:
+                      LanePosition:
+                        roadId: ''
+                        laneId: '140'
+                        s: 16.0452
+                        offset: -0.4356
+                        Orientation:
+                          type: relative
+                          h: 0
+                          p: -0.0
+                          r: 0
+              - LongitudinalAction:
+                  SpeedAction:
+                    SpeedActionDynamics:
+                      dynamicsDimension: time
+                      value: 0
+                      dynamicsShape: step
+                    SpeedActionTarget:
+                      AbsoluteTargetSpeed:
+                        value: 4
+          - entityRef: Pedestrian2
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ''
+                      laneId: '3027'
+                      s: 9.0675
+                      offset: 0.159
+                      Orientation:
+                        type: relative
+                        h: 0
+                        p: -0.0
+                        r: 0
+          - entityRef: Pedestrian3
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ''
+                      laneId: '3041'
+                      s: 9.5906
+                      offset: 0.0499
+                      Orientation:
+                        type: relative
+                        h: 0
+                        p: -0.0
+                        r: 0
+          - entityRef: Pedestrian4
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ''
+                      laneId: '3104'
+                      s: 2.6185
+                      offset: -0.2558
+                      Orientation:
+                        type: relative
+                        h: 0
+                        p: -0.0
+                        r: 0
+    Story:
+      - name: ''
+        Act:
+          - name: _EndCondition
+            ManeuverGroup:
+              - maximumExecutionCount: 1
+                name: ''
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef:
+                    - entityRef: ego
+                Maneuver:
+                  - name: ''
+                    Event:
+                      - name: ''
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: ego
+                                    EntityCondition:
+                                      ReachPositionCondition:
+                                        Position:
+                                          LanePosition:
+                                            roadId: ''
+                                            laneId: '649'
+                                            s: 3.4021
+                                            offset: 0.018
+                                            Orientation:
+                                              type: relative
+                                              h: 0
+                                              p: -0.0
+                                              r: 0
+                                        tolerance: 1
+                        Action:
+                          - name: ''
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitSuccess
+                      - name: ''
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 300
+                                      rule: greaterThan
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: ego
+                                    EntityCondition:
+                                      CollisionCondition:
+                                        EntityRef:
+                                          entityRef: Pedestrian0
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: ego
+                                    EntityCondition:
+                                      CollisionCondition:
+                                        EntityRef:
+                                          entityRef: Pedestrian1
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: ego
+                                    EntityCondition:
+                                      CollisionCondition:
+                                        EntityRef:
+                                          entityRef: Npc2
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: ego
+                                    EntityCondition:
+                                      CollisionCondition:
+                                        EntityRef:
+                                          entityRef: Npc3
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: ego
+                                    EntityCondition:
+                                      CollisionCondition:
+                                        EntityRef:
+                                          entityRef: Npc4
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: ego
+                                    EntityCondition:
+                                      CollisionCondition:
+                                        EntityRef:
+                                          entityRef: Pedestrian2
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: ego
+                                    EntityCondition:
+                                      CollisionCondition:
+                                        EntityRef:
+                                          entityRef: Pedestrian3
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: ego
+                                    EntityCondition:
+                                      CollisionCondition:
+                                        EntityRef:
+                                          entityRef: Pedestrian4
+                        Action:
+                          - name: ''
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitFailure
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name: ''
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        SimulationTimeCondition:
+                          value: 0
+                          rule: greaterThan
+    StopTrigger:
+      ConditionGroup: []

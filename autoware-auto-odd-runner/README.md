@@ -1,0 +1,210 @@
+# Overview
+
+The `TierIVLgSvlBridge` is a simple Python bridge server, that allows using the [LG SVL Simulator](https://www.svlsimulator.com/) as a simulator in the [TierIV scenario runner](https://github.com/tier4/scenario_simulator_v2).
+
+The server listens to the ports specified in the [TierIV communciation protocol](https://tier4.github.io/scenario_simulator_v2-docs/design/ZeroMQ/) and receives/responds messages of the [ZeroMQ](https://zeromq.org/) protocol.
+
+The "simulator" module in the TierIV scenario runner is responsible for the physical simulation of vehicles, pedestrians, and sensors (such as LIDAR) while the [scenario test runner](https://tier4.github.io/scenario_simulator_v2-docs/user_guide/scenario_test_runner/ScenarioTestRunner/) plays/runs a scenario.
+
+LG SVL Simulator is capable of simulating a wide range of vehicles (ego and NPC) and pedestrians, providing the [PythonAPI](https://www.svlsimulator.com/docs/python-api/python-api/) for controlling a simulation.
+
+This utility is responsible for receiving requests from the TierIV scenario test runner and routing them to the LG SVL Simulator PythonAPI.
+
+This Runner can be built as a separate Docker container and can run/play ODD scenarios from [Autoware examples](https://gitlab.com/autowarefoundation/operational-design-domains/-/tree/master/cargo_delivery/scenarios)
+
+
+# Build & run the container
+
+
+**0. Clone** the `Scenario/runner` (e.g. this) repo and `cd` to the `runner` folder (where the Makefiles are placed)
+
+**1. Build** the image by running
+
+```bash
+make -f Makefile.autoware-auto-odd build
+```
+
+**2. Start** the SVL in API-Only mode
+
+**3. Run** the container passing a scenario URL, a lanelet HD map URL, and some environment variables:
+
+**Shalun map**
+
+```bash
+docker run -it --network="host" \
+--env LGSVL__MAP=97128028-33c7-4411-b1ec-d693ed35071f \
+--env LGSVL__SIMULATOR_HOST=127.0.0.1 \
+--env LGSVL__SIMULATOR_PORT=8181 \
+--env LGSVL__VEHICLE_0=12d47257-a929-4077-827f-a94a42830cfd \
+autoware-auto-odd-runner:latest \
+  run \
+    "https://gitlab.com/autowarefoundation/operational-design-domains/-/raw/master/cargo_delivery/scenarios/UC-001-0023-Shalun.yaml" \
+    "https://gitlab.com/autowarefoundation/operational-design-domains/-/raw/master/cargo_delivery/maps/shalun/lanelet2_map.osm"
+```
+
+**Kashiwa-no-ha map**
+
+*NOTE:* Kashiwa map is not publicly available on WISE, pls upload the asset bundle and paste its asset ID into `LGSVL__MAP`. The snippet below contains my private asset ID for this map.
+
+```bash
+docker run -it --network="host" \
+--env LGSVL__MAP=dd753bf6-d944-48aa-a2ef-cd453926c794 \
+--env LGSVL__SIMULATOR_HOST=127.0.0.1 \
+--env LGSVL__SIMULATOR_PORT=8181 \
+--env LGSVL__VEHICLE_0=12d47257-a929-4077-827f-a94a42830cfd \
+autoware-auto-odd-runner:latest \
+  run \
+    "https://gitlab.com/autowarefoundation/operational-design-domains/-/raw/master/cargo_delivery/scenarios/UC-001-0006-Kashiwa.yaml" \
+    "https://gitlab.com/autowarefoundation/operational-design-domains/-/raw/master/cargo_delivery/maps/kashiwa/lanelet2_map.osm"
+```
+
+
+**4.** As there is no RVIZ used in the scenario player, the scenario progress can only be visible in SVL.
+
+*NOTE:* as opposed to a "template" run, the run approach above does NOT stop the simulation after the scenario ends, so stop it manually after the container has finished.
+
+Demo [video](https://youtu.be/ZyOCxiEDrz0) with running the runner.
+
+To test with local files, first start a local HTTP server:
+
+```
+run python3 -m http.server
+```
+
+this must be run in a folder, which includes the scenario and lanelet files.
+
+Then you can use smth like
+
+```
+run \
+  http://localhost:8000/Projects/scenario/kashiwa.yaml \
+  http://localhost:8000/Projects/scenario/kashiwa.osm
+```
+
+
+# Build & run locally
+
+## Dependencies
+
+* Ubuntu 20.04
+* Python3.8 or greater
+* [ROS2 Foxy](https://docs.ros.org/en/foxy/Installation/Ubuntu-Install-Debians.html)
+* [TierIV simulator V2](https://tier4.github.io/scenario_simulator_v2-docs/tutorials/BuildInstructions)
+* Latest [LG SVL Simulator](https://github.com/lgsvl/simulator/releases) release linked to the WISE cloud and an `API-Only` simulation available on cloud
+* [LG SVL Simulator PythonAPI](https://github.com/lgsvl/PythonAPI)
+* (optional) Google [protobuf compiler](http://google.github.io/proto-lens/installing-protoc.html)
+
+*Note:* Python virtual environment usage is recommended
+
+```bash
+pip install -r requirements.txt
+```
+
+
+## Introductory notes
+
+The protobuf files were taken from the original TierIV simulation runner [repo](https://github.com/tier4/scenario_simulator_v2/tree/master/simulation/simulation_interface/proto)
+
+Messages are decribed [here](https://tier4.github.io/scenario_simulator_v2-docs/proto_doc/protobuf)
+
+All the `*.proto` files in the `proto/` folder are just copies of the protobuf files mentioned above.
+All the `*_pb2.py` files in the `proto/` folder were autogenerated (compiled) using
+
+```
+cd proto
+protoc -I=. --python_out=. simulation_api_schema.proto \
+&& protoc -I=. --python_out=. autoware_control_msgs.proto \
+&& protoc -I=. --python_out=. autoware_vehicle_msgs.proto \
+&& protoc -I=. --python_out=. builtin_interfaces.proto \
+&& protoc -I=. --python_out=. geometry_msgs.proto \
+&& protoc -I=. --python_out=. openscenario_msgs.proto \
+&& protoc -I=. --python_out=. rosgraph_msgs.proto \
+&& protoc -I=. --python_out=. simulation_api_schema.proto \
+&& protoc -I=. --python_out=. std_msgs.proto
+```
+
+
+## Concept description
+
+The bridge server listens to the next ports:
+```
+ initialize                5555
+ update_frame              5556
+ update_sensor_frame       5557
+ spawn_vehicle_entity      5558
+ spawn_pedestrian_entity   5559
+ spawn_misc_object_entity  5560
+ despawn_entity            5561
+ update_entity_status      5562
+ attach_lidar_sensor       5563
+ attach_detection_sensor   5564
+ ```
+
+For now, the next request handling is implemented for the minimum viable demo:
+
++ *initialize* request sets the simulation time step (default 0.033 seconds)
++ *spawn_vehicle_entity* is rerouted to the PythonAPI `lgsvl.Simulator.add_agent(...)`, its result (a reference to a vehicle instance in Simulator) is stored internally. Each next NPC is of a different type, this is made for demo purposes.
++ *spawn_pedestrian_entity* is rerouted to the PythonAPI `lgsvl.Simulator.add_agent(...)`, its result (a reference to a pedestrian instance in Simulator) is stored internally.
++ *update_entity_status* converts the new entity's status (position and rotation) from the world coordinate to the Simulator Unity coordinates and sets this new state to a corresponding vehicle/pedestrian instance (held by reference internally), so that all the moving entities on a scene are being teleported to new places
++ *update_frame* runs the simulation in Simulator for an initially set timestep, all the sensors data is being simulated and updated during this call
+
+The bridge server is intended to be as simple as possible, so it handles all the requests in a single thread. To increase its performance, if necessary, the first good step would be to split handling the most loaded slots (`update_frame`, `update_sensor_frame`, `update_entity_status`) to the separate dedicated threads.
+
+
+## Run
+
+Make sure you ahve an instance of the LG SVL simulator running at localhost:8181 in the `API Only` mode.
+You will need to have the Shalun map for SVL simulator and its lanelet for the TierIV.
+The scenario file for the simulation can be generated as described [here](https://tier4.github.io/scenario_simulator_v2-docs/user_guide/scenario_editor/ScenarioEditorUserGuide/)
+
+SVL Simulator must have an 'API-only' simulation available on the staging WISE or offline
+
+Make sure you have the [Shalun map](https://wise.staging.lgsvlsimulator.com/maps/profile/97128028-33c7-4411-b1ec-d693ed35071f) avaliable locally or you have a stable connection to the staging WISE (https://wise.staging.lgsvlsimulator.com)
+
+The `demo/shalun-1ego-nps-pedestrians.yaml` scenario can be used in this demonstration, or any other scenario file that was [created](https://tier4.github.io/scenario_simulator_v2-docs/user_guide/scenario_editor/CreateSimpleScenario/) and [prepared](https://tier4.github.io/scenario_simulator_v2-docs/user_guide/scenario_test_runner/ScenarioTestRunner/) correspondingly.
+
+**1)** Start the LG SVL Simulator and run an `API-Only` simulation
+
+**2)** Run the bridge. 
+Activate a virtual environment where the `lgsvl` package is installed and set up necessary environment variables:
+
+```bash
+export LGSVL__MAP=97128028-33c7-4411-b1ec-d693ed35071f \
+&& export LGSVL__SIMULATOR_HOST=localhost \
+&& export LGSVL__SIMULATOR_PORT=8181 \
+&& export LGSVL__VEHICLE_0=12d47257-a929-4077-827f-a94a42830cfd
+```
+
+Where the `LGSVL__MAP` should be an asset ID of the map for the scenario you are going to run. For example, `97128028-33c7-4411-b1ec-d693ed35071f` is the Shalun map. The `LGSVL__VEHICLE_0` should be an asset ID of one of the available ego vehicles.
+
+Start the bridge script as:
+
+```bash
+python3 tier4_lgsvl_bridge.py
+```
+Observe no errors were reported and the script is running (has not returned)
+
+**3)** Run the TierIV scenario test runner as
+   
+```bash
+ros2 launch scenario_test_runner scenario_test_runner.launch.py \
+scenario:=<... full absolute path to ...>demo/shalun-1ego-nps-pedestrians.yaml \
+launch_rviz:=true
+```
+
+*Note:* `launch_rviz:=false` might be more convenient in case if the TierIV scenario visualization is not necessary
+
+**4)** Observe the scenario running visualized in RVIZ and, at the same time, the ego vehicle, NPCs and pedestrians moving in the LG SVL Simulator.
+
+A demo video with running the bridge, Simulator and the scenario runner altogether can be found [here](https://youtu.be/j8juFQ_jMEA).
+
+
+## Known issues
+
+#### NPCs collision
+
+As all the NPC cars are of the same size in the scenario editor, while the NPC models in the Simulator differs in size, and that sometimes lead to NPC collision with other objects. This issue can be fixed either with using only 1 NPC model in Simulator (the one that fits to the TierIV scenario NPC size the best), but it doesn't seem to be a major problem.
+
+#### "Unnatural" agents behavior
+
+The scenario runner actually just sends new corrdinates for each entity during simulation, so all the agents are "teleported" to their new locations from the Simulator's point of view. This way the NPC cars do not spin their wheels and do not enable/disable turning lights, and the pedestrians do not "walk". There is no way to fix this in the current bridge architecture, so the best approach here would be creating a converter from the TierIV scenario file to the LG SVL VSE JSON format file, so that the TierIV scenario runner is not used at all and the whole simulation is controlled by the LG SVL. This should be discussed in more detail if necessary.

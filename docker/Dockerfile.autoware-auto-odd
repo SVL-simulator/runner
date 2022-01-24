@@ -1,0 +1,72 @@
+FROM tier4/scenario_simulator_v2:foxy
+
+# The "git describe" done by get_version() in runner/setup.py needs .git (and the "git describe" done by get_version() in
+# externals/PythonApi/setup.py needs its subdirectory .git/modules/externals/PythonApi):
+ADD .git /app/.git
+
+# Eliminate an obsolete pip warning
+RUN set -ex \
+    && python3 -m pip install --upgrade pip
+
+ADD externals /app/externals
+
+# NOTE: The line below is parsed by ../Makefile to get the default value of REQUIREMENTS_TXT.
+ARG REQUIREMENTS_TXT=requirements.txt
+ARG GENERATE_REQUIREMENTS_TXT=false
+COPY ${REQUIREMENTS_TXT} /app/requirements.txt
+RUN set -ex; \
+    requirements=/app/requirements.txt; \
+    if ${GENERATE_REQUIREMENTS_TXT} || ! [ -s $requirements ]; then requirements=/app/externals/PythonApi/requirements.txt; fi; \
+    cd /app/externals/PythonApi; \
+    python3 -m pip install -r $requirements .
+
+ARG PYTHON_INSTALL_ENV
+ADD autoware-auto-odd-runner /app/runner
+RUN set -ex \
+    && cd /app/runner \
+#   an additional runner-specific Python requirements
+    && python3 -m pip install -r requirements.txt . \
+    && eval ${PYTHON_INSTALL_ENV} python3 -m pip install .
+
+COPY scripts/scenario_runner.sh /usr/share/scenarios-runner/scripts/
+
+ADD autoware-auto-odd-runner /app/runner
+RUN set -ex; cd /app; mkdir proto
+COPY autoware-auto-odd-runner/scenario_runner/proto/ /app/proto
+
+RUN set -ex \
+    && apt-get update -qq \
+    && DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -q -y \
+        jq \
+        libglib2.0-0 \
+        libsm6 \
+        libxrender1 \
+        libxext6 \
+        libgl1 \
+        netcat-openbsd \
+        wget \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+ARG image_git_describe=(unknown)
+ARG image_git_describe_submodules=(unknown)
+ARG image_tag=(unset)
+ARG image_uuidgen=(unset)
+
+RUN set -ex \
+  && echo "IMAGE_APP=scenarios/runner/autoware-auto-odd\n\
+IMAGE_CREATED_BY=auto-jenkins\n\
+IMAGE_CREATED_FROM=${image_git_describe}\n\
+IMAGE_CREATED_FROM_SUBMODULES='${image_git_describe_submodules}'\n\
+IMAGE_CREATED_ON=$(date --iso-8601=seconds --utc)\n\
+IMAGE_TAG=${image_tag}\n\
+# Increment IMAGE_INTERFACE_VERSION whenever changes to the image require that the launcher be updated.\n\
+IMAGE_INTERFACE_VERSION=2\n\
+IMAGE_UUID=${image_uuidgen}"\
+  >> /etc/wise-image-info.source \
+  && echo "Scenarios/runner wise-image-info.source:" \
+  && cat /etc/wise-image-info.source
+
+RUN echo OS_$(grep '^VERSION=' /etc/os-release) \
+    && echo PYTHON_VERSION=${PYTHON_VERSION} \
+    && echo PYTHON_PIP_VERSION=${PYTHON_PIP_VERSION}
